@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mesa — Restaurante</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FF6B35;
+    --orange-dark: #E05520;
+    --orange-light: #FFF0EA;
+    --green: #2EC98A;
+    --green-dark: #1FA870;
+    --green-light: #E6FAF3;
+    --blue: #3B82F6;
+    --blue-dark: #2563EB;
+    --blue-light: #EFF6FF;
+    --red: #EF4444;
+    --red-dark: #DC2626;
+    --red-light: #FEF2F2;
+    --gray: #6B7280;
+    --bg: #F9F6F2;
+    --white: #FFFFFF;
+    --text: #1A1A2E;
+    --shadow: 0 4px 24px rgba(0,0,0,0.10);
+    --shadow-btn: 0 6px 20px rgba(0,0,0,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* HEADER */
+  .header {
+    width: 100%;
+    background: var(--white);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 20px 24px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: var(--orange);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .logo-name {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .mesa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--orange-light);
+    color: var(--orange-dark);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 7px 18px;
+    border-radius: 100px;
+    border: 2px solid var(--orange);
+  }
+  .mesa-num {
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  /* MAIN */
+  .main {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 20px 40px;
+    flex: 1;
+  }
+  .greeting {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .greeting h2 {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .greeting p {
+    font-size: 15px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+
+  /* BUTTONS */
+  .btn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .btn-call {
+    width: 100%;
+    padding: 22px 24px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: 'Nunito', sans-serif;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-call:active { transform: scale(0.97); }
+  .btn-call:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  .btn-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .btn-text { text-align: left; }
+  .btn-title {
+    font-size: 18px;
+    font-weight: 900;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .btn-sub {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.75;
+    display: block;
+  }
+
+  .btn-garcom { background: var(--orange); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
+  .btn-garcom .btn-icon { background: rgba(255,255,255,0.25); }
+  .btn-garcom .btn-title { color: white; }
+  .btn-garcom .btn-sub { color: white; }
+
+  .btn-conta { background: var(--green); box-shadow: 0 6px 20px rgba(46,201,138,0.35); }
+  .btn-conta .btn-icon { background: rgba(255,255,255,0.25); }
+  .btn-conta .btn-title { color: white; }
+  .btn-conta .btn-sub { color: white; }
+
+  .btn-pedido { background: var(--blue); box-shadow: 0 6px 20px rgba(59,130,246,0.35); }
+  .btn-pedido .btn-icon { background: rgba(255,255,255,0.25); }
+  .btn-pedido .btn-title { color: white; }
+  .btn-pedido .btn-sub { color: white; }
+
+  .btn-cancel {
+    background: var(--white);
+    border: 2px solid var(--red);
+    box-shadow: 0 4px 16px rgba(239,68,68,0.15);
+  }
+  .btn-cancel .btn-icon { background: var(--red-light); }
+  .btn-cancel .btn-title { color: var(--red-dark); }
+  .btn-cancel .btn-sub { color: var(--red); }
+
+  /* STATUS TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1A1A2E;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    text-align: center;
+    max-width: 320px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--green-dark); }
+  .toast.error { background: var(--red-dark); }
+  .toast.cancel { background: #555; }
+
+  /* ACTIVE CALL BANNER */
+  .active-call {
+    display: none;
+    background: var(--orange-light);
+    border: 2px solid var(--orange);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .active-call.show { display: block; }
+  .active-call-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--orange-dark);
+    margin-bottom: 4px;
+  }
+  .active-call-type {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--orange-dark);
+  }
+  .pulse {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: var(--orange);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+  }
+
+  .footer {
+    text-align: center;
+    padding: 16px 0 8px;
+    font-size: 12px;
+    color: #bbb;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-area">
+    <div class="logo-icon">🍽️</div>
+    <span class="logo-name" id="restaurant-name">Restaurante</span>
+  </div>
+  <div class="mesa-badge">
+    📍 Mesa <span class="mesa-num" id="mesa-display">—</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="greeting">
+    <h2>Como posso ajudar? 😊</h2>
+    <p>Toque em uma opção abaixo</p>
+  </div>
+
+  <div class="active-call" id="active-call">
+    <div class="active-call-title"><span class="pulse"></span>Chamado enviado!</div>
+    <div class="active-call-type" id="active-call-type">—</div>
+  </div>
+
+  <div class="btn-grid">
+    <button class="btn-call btn-garcom" onclick="enviarChamado('garcom')">
+      <div class="btn-icon">🔔</div>
+      <div class="btn-text">
+        <span class="btn-title">Chamar Garçom</span>
+        <span class="btn-sub">O garçom virá até você</span>
+      </div>
+    </button>
+
+    <button class="btn-call btn-conta" onclick="enviarChamado('conta')">
+      <div class="btn-icon">💳</div>
+      <div class="btn-text">
+        <span class="btn-title">Pedir a Conta</span>
+        <span class="btn-sub">Solicitar fechamento da conta</span>
+      </div>
+    </button>
+
+    <button class="btn-call btn-pedido" onclick="enviarChamado('pedido')">
+      <div class="btn-icon">🍽️</div>
+      <div class="btn-text">
+        <span class="btn-title">Fazer Pedido</span>
+        <span class="btn-sub">Quero pedir algo novo</span>
+      </div>
+    </button>
+
+    <button class="btn-call btn-cancel" onclick="cancelarChamado()" id="btn-cancel">
+      <div class="btn-icon">❌</div>
+      <div class="btn-text">
+        <span class="btn-title">Cancelar Chamado</span>
+        <span class="btn-sub">Não preciso mais de ajuda</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="footer">Não é necessário instalar nenhum aplicativo</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Pega número da mesa da URL: ?mesa=12
+  const params = new URLSearchParams(window.location.search);
+  const mesa = params.get('mesa') || '1';
+  const nomeRestaurante = params.get('nome') || 'Restaurante';
+
+  document.getElementById('mesa-display').textContent = mesa;
+  document.getElementById('restaurant-name').textContent = nomeRestaurante;
+  document.title = `Mesa ${mesa} — ${nomeRestaurante}`;
+
+  const STORAGE_KEY = 'restaurante_chamados';
+  let chamadoAtivo = null;
+
+  const labels = {
+    garcom: '🔔 Chamar Garçom',
+    conta: '💳 Pedir a Conta',
+    pedido: '🍽️ Fazer Pedido'
+  };
+
+  function getChamados() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+  function saveChamados(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    // Notifica outras abas
+    const bc = new BroadcastChannel('restaurante_updates');
+    bc.postMessage({ type: 'update' });
+    bc.close();
+  }
+
+  function enviarChamado(tipo) {
+    const lista = getChamados();
+    // Remove chamado anterior desta mesa
+    const filtrado = lista.filter(c => c.mesa !== mesa);
+    const novo = {
+      id: Date.now(),
+      mesa: mesa,
+      tipo: tipo,
+      label: labels[tipo],
+      hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      timestamp: Date.now(),
+      status: 'pendente'
+    };
+    filtrado.push(novo);
+    saveChamados(filtrado);
+    chamadoAtivo = tipo;
+    mostrarChamadoAtivo(labels[tipo]);
+    mostrarToast('✅ Chamado enviado! O garçom está a caminho.', 'success');
+  }
+
+  function cancelarChamado() {
+    const lista = getChamados();
+    const filtrado = lista.filter(c => c.mesa !== mesa);
+    saveChamados(filtrado);
+    chamadoAtivo = null;
+    document.getElementById('active-call').classList.remove('show');
+    mostrarToast('Chamado cancelado.', 'cancel');
+  }
+
+  function mostrarChamadoAtivo(label) {
+    document.getElementById('active-call-type').textContent = label;
+    document.getElementById('active-call').classList.add('show');
+  }
+
+  function mostrarToast(msg, tipo='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + tipo;
+    setTimeout(() => { t.className = 'toast ' + tipo; }, 3000);
+  }
+
+  // Ao carregar, verifica se já tem chamado ativo desta mesa
+  function verificarChamadoAtivo() {
+    const lista = getChamados();
+    const meu = lista.find(c => c.mesa === mesa && c.status === 'pendente');
+    if (meu) {
+      chamadoAtivo = meu.tipo;
+      mostrarChamadoAtivo(meu.label);
+    }
+  }
+
+  // Escuta quando o chamado for atendido pelo painel
+  const bc = new BroadcastChannel('restaurante_updates');
+  bc.onmessage = () => {
+    const lista = getChamados();
+    const meu = lista.find(c => c.mesa === mesa);
+    if (!meu && chamadoAtivo) {
+      chamadoAtivo = null;
+      document.getElementById('active-call').classList.remove('show');
+      mostrarToast('✅ Garçom a caminho! Chamado atendido.', 'success');
+    }
+  };
+
+  verificarChamadoAtivo();
+</script>
+</body>
+</html>

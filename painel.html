@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Restaurante</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FF6B35;
+    --orange-dark: #E05520;
+    --orange-light: #FFF0EA;
+    --green: #2EC98A;
+    --green-dark: #1FA870;
+    --green-light: #E6FAF3;
+    --blue: #3B82F6;
+    --blue-light: #EFF6FF;
+    --red: #EF4444;
+    --red-light: #FEF2F2;
+    --yellow: #F59E0B;
+    --yellow-light: #FFFBEB;
+    --bg: #F0EDE8;
+    --card-bg: #FFFFFF;
+    --text: #1A1A2E;
+    --gray: #6B7280;
+    --border: #E5E7EB;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--text);
+    color: white;
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar-logo {
+    width: 40px; height: 40px;
+    background: var(--orange);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .topbar-title {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+  }
+  .topbar-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 600;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(46,201,138,0.2);
+    color: #2EC98A;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .live-dot span {
+    width: 8px; height: 8px;
+    background: #2EC98A;
+    border-radius: 50%;
+    animation: blink 1.5s infinite;
+    display: inline-block;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .clock {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* SETTINGS BAR */
+  .settings-bar {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .settings-bar label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray);
+  }
+  .settings-bar input[type="text"] {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    transition: border 0.2s;
+    width: 180px;
+  }
+  .settings-bar input:focus { border-color: var(--orange); }
+  .settings-bar input[type="number"] {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    width: 80px;
+  }
+  .btn-gerar {
+    background: var(--orange);
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-gerar:hover { background: var(--orange-dark); }
+  .btn-clearall {
+    background: var(--red-light);
+    color: var(--red);
+    border: 2px solid var(--red);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background 0.2s;
+  }
+  .btn-clearall:hover { background: var(--red); color: white; }
+
+  /* STATS */
+  .stats {
+    display: flex;
+    gap: 14px;
+    padding: 20px 28px 0;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 16px 20px;
+    min-width: 140px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
+  }
+  .stat-card.orange { border-left-color: var(--orange); }
+  .stat-card.green { border-left-color: var(--green); }
+  .stat-card.blue { border-left-color: var(--blue); }
+  .stat-card.yellow { border-left-color: var(--yellow); }
+  .stat-num {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+
+  /* PANEL */
+  .panel {
+    padding: 20px 28px 40px;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--text);
+  }
+  .panel-sub {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* CHAMADO CARDS */
+  .chamados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+
+  .chamado-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 2px solid transparent;
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: slideIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .chamado-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+
+  .chamado-card.garcom { border-color: var(--orange); background: linear-gradient(135deg, #fff 60%, var(--orange-light)); }
+  .chamado-card.conta { border-color: var(--green); background: linear-gradient(135deg, #fff 60%, var(--green-light)); }
+  .chamado-card.pedido { border-color: var(--blue); background: linear-gradient(135deg, #fff 60%, var(--blue-light)); }
+
+  /* urgency after 2 min */
+  .chamado-card.urgente {
+    border-color: var(--red) !important;
+    animation: urgente 0.8s ease infinite alternate;
+  }
+  @keyframes urgente {
+    from { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+    to { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .mesa-big {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+  }
+  .mesa-lbl {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+  .tipo-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .tipo-emoji { font-size: 36px; }
+  .tipo-label {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+  .garcom .tipo-label { background: var(--orange-light); color: var(--orange-dark); }
+  .conta .tipo-label { background: var(--green-light); color: var(--green-dark); }
+  .pedido .tipo-label { background: var(--blue-light); color: var(--blue); }
+
+  .card-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .hora-chamado {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+  .tempo-decorrido {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text);
+  }
+  .tempo-lbl {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .btn-atender {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.12s;
+    color: white;
+  }
+  .btn-atender:active { transform: scale(0.97); }
+  .garcom .btn-atender { background: var(--orange); }
+  .conta .btn-atender { background: var(--green); }
+  .pedido .btn-atender { background: var(--blue); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray);
+    display: none;
+  }
+  .empty-state.show { display: block; }
+  .empty-icon { font-size: 64px; margin-bottom: 16px; }
+  .empty-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+  .empty-sub { font-size: 15px; font-weight: 600; }
+
+  /* QR MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal h3 {
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .modal p {
+    font-size: 14px;
+    color: var(--gray);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  #qr-container {
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .link-box {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 600;
+    word-break: break-all;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .modal-btns {
+    display: flex;
+    gap: 10px;
+  }
+  .btn-fechar {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--gray);
+  }
+  .btn-copiar {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: var(--orange);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* HISTORY */
+  .history-section {
+    padding: 0 28px 40px;
+  }
+  .history-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--gray);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-item {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .history-item span:first-child { color: var(--text); font-weight: 700; }
+
+  /* ALERT BANNER */
+  .alert-banner {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--orange);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 900;
+    z-index: 150;
+    box-shadow: 0 8px 32px rgba(255,107,53,0.4);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    text-align: center;
+    pointer-events: none;
+  }
+  .alert-banner.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- Alert Banner -->
+<div class="alert-banner" id="alert-banner"></div>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">🍽️</div>
+    <div>
+      <div class="topbar-title" id="topbar-name">Painel do Restaurante</div>
+      <div class="topbar-sub">Atualização em tempo real</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="live-dot"><span></span>AO VIVO</div>
+    <div class="clock" id="clock">00:00:00</div>
+  </div>
+</div>
+
+<!-- Settings Bar -->
+<div class="settings-bar">
+  <label>Nome:</label>
+  <input type="text" id="cfg-nome" value="Restaurante" placeholder="Nome do restaurante" oninput="salvarConfig()">
+  <label>Mesa nº:</label>
+  <input type="number" id="cfg-mesa" value="1" min="1" max="99" style="width:80px">
+  <button class="btn-gerar" onclick="gerarQR()">📱 Gerar QR Code da Mesa</button>
+  <button class="btn-clearall" onclick="limparTudo()">🗑️ Limpar Tudo</button>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card orange">
+    <div class="stat-num" id="stat-pendentes">0</div>
+    <div class="stat-label">Chamados Pendentes</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-num" id="stat-atendidos">0</div>
+    <div class="stat-label">Atendidos Hoje</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-num" id="stat-mesas">0</div>
+    <div class="stat-label">Mesas Ativas</div>
+  </div>
+</div>
+
+<!-- Panel -->
+<div class="panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">📋 Chamados em Aberto</div>
+      <div class="panel-sub">Clique em "Atendido" para concluir o chamado</div>
+    </div>
+  </div>
+
+  <div class="empty-state show" id="empty-state">
+    <div class="empty-icon">✅</div>
+    <div class="empty-title">Tudo tranquilo por aqui!</div>
+    <div class="empty-sub">Nenhum chamado pendente no momento.</div>
+  </div>
+
+  <div class="chamados-grid" id="chamados-grid"></div>
+</div>
+
+<!-- History -->
+<div class="history-section" id="history-section" style="display:none">
+  <div class="history-title">📜 Histórico de Atendimentos</div>
+  <div class="history-list" id="history-list"></div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>📱 QR Code da Mesa <span id="qr-mesa-num"></span></h3>
+    <p>Imprima e cole na mesa. O cliente escaneia e faz o chamado.</p>
+    <div id="qr-container"></div>
+    <div class="link-box" id="qr-link-box"></div>
+    <div class="modal-btns">
+      <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+      <button class="btn-copiar" onclick="copiarLink()">📋 Copiar Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Code Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+  const STORAGE_KEY = 'restaurante_chamados';
+  const HISTORY_KEY = 'restaurante_historico';
+  const CONFIG_KEY = 'restaurante_config';
+  let atendidosHoje = 0;
+  let ultimaQtd = 0;
+
+  // Config
+  function salvarConfig() {
+    const nome = document.getElementById('cfg-nome').value || 'Restaurante';
+    localStorage.setItem(CONFIG_KEY, JSON.stringify({ nome }));
+    document.getElementById('topbar-name').textContent = 'Painel — ' + nome;
+  }
+  function carregarConfig() {
+    try {
+      const cfg = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+      if (cfg.nome) {
+        document.getElementById('cfg-nome').value = cfg.nome;
+        document.getElementById('topbar-name').textContent = 'Painel — ' + cfg.nome;
+      }
+    } catch {}
+  }
+
+  function getChamados() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+  function saveChamados(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    notificar();
+  }
+  function getHistorico() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+  }
+  function notificar() {
+    const bc = new BroadcastChannel('restaurante_updates');
+    bc.postMessage({ type: 'update' });
+    bc.close();
+  }
+
+  // CLOCK
+  function atualizarClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  }
+  setInterval(atualizarClock, 1000);
+  atualizarClock();
+
+  // Tempo decorrido
+  function tempoDecorrido(timestamp) {
+    const diff = Math.floor((Date.now() - timestamp) / 1000);
+    const min = Math.floor(diff / 60);
+    const sec = diff % 60;
+    return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+
+  function getTipoInfo(tipo) {
+    const map = {
+      garcom: { emoji: '🔔', label: 'Garçom', classe: 'garcom' },
+      conta:  { emoji: '💳', label: 'Conta',  classe: 'conta' },
+      pedido: { emoji: '🍽️', label: 'Pedido', classe: 'pedido' }
+    };
+    return map[tipo] || map.garcom;
+  }
+
+  function atender(id) {
+    const lista = getChamados();
+    const chamado = lista.find(c => c.id === id);
+    const nova = lista.filter(c => c.id !== id);
+    saveChamados(nova);
+
+    // Salva histórico
+    if (chamado) {
+      const hist = getHistorico();
+      hist.unshift({
+        ...chamado,
+        horaAtendido: new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
+      });
+      if (hist.length > 20) hist.length = 20;
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+      atendidosHoje++;
+    }
+    renderizar();
+  }
+
+  function limparTudo() {
+    if (confirm('Limpar todos os chamados?')) {
+      saveChamados([]);
+      renderizar();
+    }
+  }
+
+  function tocarSom() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [880, 1100].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
+        osc.start(ctx.currentTime + i * 0.15);
+        osc.stop(ctx.currentTime + i * 0.15 + 0.35);
+      });
+    } catch {}
+  }
+
+  function mostrarAlerta(texto) {
+    const b = document.getElementById('alert-banner');
+    b.textContent = texto;
+    b.classList.add('show');
+    setTimeout(() => b.classList.remove('show'), 3500);
+  }
+
+  function renderizar() {
+    const lista = getChamados();
+    const grid = document.getElementById('chamados-grid');
+    const empty = document.getElementById('empty-state');
+
+    // Stats
+    document.getElementById('stat-pendentes').textContent = lista.length;
+    document.getElementById('stat-atendidos').textContent = atendidosHoje;
+    document.getElementById('stat-mesas').textContent = new Set(lista.map(c => c.mesa)).size;
+
+    if (lista.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.add('show');
+    } else {
+      empty.classList.remove('show');
+    }
+
+    // Ordena por timestamp
+    const ordenado = [...lista].sort((a, b) => a.timestamp - b.timestamp);
+
+    // Limpa cards que não existem mais
+    const idsAtuais = new Set(ordenado.map(c => String(c.id)));
+    grid.querySelectorAll('.chamado-card').forEach(el => {
+      if (!idsAtuais.has(el.dataset.id)) el.remove();
+    });
+
+    ordenado.forEach(c => {
+      const info = getTipoInfo(c.tipo);
+      const urgente = (Date.now() - c.timestamp) > 120000;
+      let card = grid.querySelector(`[data-id="${c.id}"]`);
+
+      if (!card) {
+        card = document.createElement('div');
+        card.className = `chamado-card ${info.classe}`;
+        card.dataset.id = c.id;
+        grid.appendChild(card);
+      }
+
+      if (urgente) card.classList.add('urgente');
+      else card.classList.remove('urgente');
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <div class="mesa-lbl">MESA</div>
+            <div class="mesa-big">${c.mesa}</div>
+          </div>
+          <div class="tipo-badge">
+            <div class="tipo-emoji">${info.emoji}</div>
+            <div class="tipo-label">${info.label}</div>
+          </div>
+        </div>
+        <div class="card-info">
+          <div class="hora-chamado">⏰ Chamado às ${c.hora}</div>
+          <div>
+            <div class="tempo-decorrido" id="tempo-${c.id}">${tempoDecorrido(c.timestamp)}</div>
+            <div class="tempo-lbl">aguardando</div>
+          </div>
+        </div>
+        <button class="btn-atender" onclick="atender(${c.id})">✅ Marcar como Atendido</button>
+      `;
+    });
+
+    // Histórico
+    const hist = getHistorico();
+    const histSection = document.getElementById('history-section');
+    const histList = document.getElementById('history-list');
+    if (hist.length > 0) {
+      histSection.style.display = 'block';
+      histList.innerHTML = hist.slice(0, 8).map(h => {
+        const info = getTipoInfo(h.tipo);
+        return `<div class="history-item">
+          <span>Mesa ${h.mesa} — ${info.emoji} ${info.label}</span>
+          <span>${h.hora} → ✅ ${h.horaAtendido}</span>
+        </div>`;
+      }).join('');
+    }
+
+    ultimaQtd = lista.length;
+  }
+
+  // Atualiza timers a cada segundo
+  function atualizarTimers() {
+    getChamados().forEach(c => {
+      const el = document.getElementById(`tempo-${c.id}`);
+      if (el) el.textContent = tempoDecorrido(c.timestamp);
+    });
+  }
+  setInterval(atualizarTimers, 1000);
+
+  // Polling + BroadcastChannel
+  const bc = new BroadcastChannel('restaurante_updates');
+  bc.onmessage = () => {
+    const lista = getChamados();
+    if (lista.length > ultimaQtd) {
+      tocarSom();
+      const novo = [...lista].sort((a,b) => b.timestamp - a.timestamp)[0];
+      const info = getTipoInfo(novo.tipo);
+      mostrarAlerta(`🔔 MESA ${novo.mesa} — ${info.label.toUpperCase()}!`);
+    }
+    renderizar();
+  };
+
+  // Polling como fallback (para quando estiver em aba diferente)
+  setInterval(() => {
+    renderizar();
+  }, 3000);
+
+  // QR CODE
+  let qrLinkAtual = '';
+  function gerarQR() {
+    const mesaNum = document.getElementById('cfg-mesa').value || '1';
+    const nome = document.getElementById('cfg-nome').value || 'Restaurante';
+    const base = window.location.href.replace('painel.html', 'mesa.html');
+    const url = `${base}?mesa=${mesaNum}&nome=${encodeURIComponent(nome)}`;
+    qrLinkAtual = url;
+
+    document.getElementById('qr-mesa-num').textContent = mesaNum;
+    document.getElementById('qr-link-box').textContent = url;
+
+    const container = document.getElementById('qr-container');
+    container.innerHTML = '';
+    new QRCode(container, {
+      text: url,
+      width: 220,
+      height: 220,
+      colorDark: '#1A1A2E',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    document.getElementById('modal').classList.add('show');
+  }
+  function fecharModal() {
+    document.getElementById('modal').classList.remove('show');
+  }
+  function copiarLink() {
+    navigator.clipboard.writeText(qrLinkAtual).then(() => {
+      mostrarAlerta('✅ Link copiado!');
+      fecharModal();
+    });
+  }
+
+  // Init
+  carregarConfig();
+  renderizar();
+</script>
+</body>
+</html>

@@ -7,239 +7,116 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --orange: #FF6B35;
-    --orange-dark: #E05520;
-    --orange-light: #FFF0EA;
-    --green: #2EC98A;
-    --green-dark: #1FA870;
-    --green-light: #E6FAF3;
-    --blue: #3B82F6;
-    --blue-dark: #2563EB;
-    --blue-light: #EFF6FF;
-    --red: #EF4444;
-    --red-dark: #DC2626;
-    --red-light: #FEF2F2;
-    --gray: #6B7280;
-    --bg: #F9F6F2;
-    --white: #FFFFFF;
-    --text: #1A1A2E;
-    --shadow: 0 4px 24px rgba(0,0,0,0.10);
-    --shadow-btn: 0 6px 20px rgba(0,0,0,0.15);
+    --orange:#FF6B35; --orange-dark:#E05520; --orange-light:#FFF0EA;
+    --green:#2EC98A; --green-dark:#1FA870; --green-light:#E6FAF3;
+    --blue:#3B82F6; --blue-dark:#2563EB; --blue-light:#EFF6FF;
+    --purple:#8B5CF6; --purple-light:#F5F3FF;
+    --red:#EF4444; --red-dark:#DC2626; --red-light:#FEF2F2;
+    --gray:#6B7280; --bg:#F9F6F2; --white:#FFFFFF; --text:#1A1A2E;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
 
-  /* HEADER */
-  .header {
-    width: 100%;
-    background: var(--white);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    padding: 20px 24px 16px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  .logo-area {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-  .logo-icon {
-    width: 48px; height: 48px;
-    background: var(--orange);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px;
-  }
-  .logo-name {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--text);
-    letter-spacing: -0.5px;
-  }
-  .mesa-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--orange-light);
-    color: var(--orange-dark);
-    font-size: 15px;
-    font-weight: 700;
-    padding: 7px 18px;
-    border-radius: 100px;
-    border: 2px solid var(--orange);
-  }
-  .mesa-num {
-    font-size: 20px;
-    font-weight: 900;
-  }
+  .header{width:100%;background:var(--white);box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:16px 20px;text-align:center;position:sticky;top:0;z-index:10;}
+  .logo-area{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;}
+  .logo-icon{width:44px;height:44px;background:var(--orange);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+  .logo-name{font-size:20px;font-weight:900;color:var(--text);}
+  .mesa-badge{display:inline-flex;align-items:center;gap:6px;background:var(--orange-light);color:var(--orange-dark);font-size:14px;font-weight:700;padding:6px 16px;border-radius:100px;border:2px solid var(--orange);}
+  .mesa-num{font-size:18px;font-weight:900;}
 
-  /* MAIN */
-  .main {
-    width: 100%;
-    max-width: 420px;
-    padding: 28px 20px 40px;
-    flex: 1;
-  }
-  .greeting {
-    text-align: center;
-    margin-bottom: 28px;
-  }
-  .greeting h2 {
-    font-size: 24px;
-    font-weight: 900;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .greeting p {
-    font-size: 15px;
-    color: var(--gray);
-    font-weight: 600;
-  }
+  .main{width:100%;max-width:440px;padding:20px 16px 60px;flex:1;}
 
-  /* BUTTONS */
-  .btn-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .btn-call {
-    width: 100%;
-    padding: 22px 24px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    font-family: 'Nunito', sans-serif;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-call:active { transform: scale(0.97); }
-  .btn-call:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+  .active-call{display:none;background:var(--orange-light);border:2px solid var(--orange);border-radius:14px;padding:14px 18px;margin-bottom:18px;text-align:center;}
+  .active-call.show{display:block;}
+  .active-call-title{font-size:13px;font-weight:700;color:var(--orange-dark);margin-bottom:2px;}
+  .active-call-type{font-size:18px;font-weight:900;color:var(--orange-dark);}
+  .active-call-obs{font-size:12px;color:var(--orange-dark);opacity:0.8;margin-top:4px;font-style:italic;word-break:break-word;}
+  .pulse{display:inline-block;width:8px;height:8px;background:var(--orange);border-radius:50%;margin-right:6px;animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.5);opacity:0.5;}}
 
-  .btn-icon {
-    width: 56px; height: 56px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-    flex-shrink: 0;
-  }
-  .btn-text { text-align: left; }
-  .btn-title {
-    font-size: 18px;
-    font-weight: 900;
-    display: block;
-    margin-bottom: 2px;
-  }
-  .btn-sub {
-    font-size: 13px;
-    font-weight: 600;
-    opacity: 0.75;
-    display: block;
-  }
+  .section-title{font-size:13px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-left:4px;}
 
-  .btn-garcom { background: var(--orange); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
-  .btn-garcom .btn-icon { background: rgba(255,255,255,0.25); }
-  .btn-garcom .btn-title { color: white; }
-  .btn-garcom .btn-sub { color: white; }
+  .btn-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+  .btn-call{width:100%;padding:18px 20px;border:none;border-radius:18px;cursor:pointer;display:flex;align-items:center;gap:16px;font-family:'Nunito',sans-serif;transition:transform 0.12s;}
+  .btn-call:active{transform:scale(0.97);}
+  .btn-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:rgba(255,255,255,0.25);}
+  .btn-text{text-align:left;}
+  .btn-title{font-size:17px;font-weight:900;display:block;margin-bottom:1px;}
+  .btn-sub{font-size:12px;font-weight:600;opacity:0.8;display:block;}
+  .btn-garcom{background:var(--orange);box-shadow:0 6px 20px rgba(255,107,53,0.3);}
+  .btn-garcom .btn-title,.btn-garcom .btn-sub{color:white;}
+  .btn-conta{background:var(--green);box-shadow:0 6px 20px rgba(46,201,138,0.3);}
+  .btn-conta .btn-title,.btn-conta .btn-sub{color:white;}
+  .btn-cancel{background:var(--white);border:2px solid var(--red);box-shadow:0 4px 16px rgba(239,68,68,0.1);}
+  .btn-cancel .btn-icon{background:var(--red-light);}
+  .btn-cancel .btn-title{color:var(--red-dark);}
+  .btn-cancel .btn-sub{color:var(--red);}
 
-  .btn-conta { background: var(--green); box-shadow: 0 6px 20px rgba(46,201,138,0.35); }
-  .btn-conta .btn-icon { background: rgba(255,255,255,0.25); }
-  .btn-conta .btn-title { color: white; }
-  .btn-conta .btn-sub { color: white; }
+  /* SEÇÃO EXPANDÍVEL */
+  .expand-section{background:var(--white);border-radius:18px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);margin-bottom:14px;}
+  .expand-header{width:100%;padding:18px 20px;border:none;cursor:pointer;display:flex;align-items:center;gap:16px;font-family:'Nunito',sans-serif;transition:filter 0.2s;}
+  .expand-header:active{filter:brightness(0.9);}
+  .expand-header.blue{background:var(--blue);}
+  .expand-header.purple{background:var(--purple);}
+  .expand-header .btn-title,.expand-header .btn-sub{color:white;}
+  .expand-chevron{margin-left:auto;font-size:18px;color:white;transition:transform 0.3s;flex-shrink:0;}
+  .expand-chevron.open{transform:rotate(180deg);}
+  .expand-body{display:none;padding:16px;}
+  .expand-body.open{display:block;}
 
-  .btn-pedido { background: var(--blue); box-shadow: 0 6px 20px rgba(59,130,246,0.35); }
-  .btn-pedido .btn-icon { background: rgba(255,255,255,0.25); }
-  .btn-pedido .btn-title { color: white; }
-  .btn-pedido .btn-sub { color: white; }
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab{flex:1;padding:9px 6px;border:2px solid var(--blue-light);border-radius:10px;background:var(--blue-light);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--blue);cursor:pointer;text-align:center;transition:all 0.2s;}
+  .tab.active{background:var(--blue);color:white;border-color:var(--blue);}
 
-  .btn-cancel {
-    background: var(--white);
-    border: 2px solid var(--red);
-    box-shadow: 0 4px 16px rgba(239,68,68,0.15);
-  }
-  .btn-cancel .btn-icon { background: var(--red-light); }
-  .btn-cancel .btn-title { color: var(--red-dark); }
-  .btn-cancel .btn-sub { color: var(--red); }
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
 
-  /* STATUS TOAST */
-  .toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: #1A1A2E;
-    color: white;
-    padding: 14px 24px;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 700;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    z-index: 999;
-    text-align: center;
-    max-width: 320px;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success { background: var(--green-dark); }
-  .toast.error { background: var(--red-dark); }
-  .toast.cancel { background: #555; }
+  .obs-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:block;}
+  .obs-textarea{width:100%;border:2px solid #E5E7EB;border-radius:12px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:var(--text);resize:none;outline:none;min-height:90px;transition:border 0.2s;}
+  .obs-textarea:focus{border-color:var(--blue);}
+  .obs-hint{font-size:11px;color:var(--gray);font-weight:600;margin-top:4px;margin-bottom:12px;}
 
-  /* ACTIVE CALL BANNER */
-  .active-call {
-    display: none;
-    background: var(--orange-light);
-    border: 2px solid var(--orange);
-    border-radius: 16px;
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  .active-call.show { display: block; }
-  .active-call-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--orange-dark);
-    margin-bottom: 4px;
-  }
-  .active-call-type {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--orange-dark);
-  }
-  .pulse {
-    display: inline-block;
-    width: 10px; height: 10px;
-    background: var(--orange);
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: pulse 1.2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.5); opacity: 0.5; }
-  }
+  .cardapio-empty{text-align:center;padding:24px 16px;color:var(--gray);}
+  .cardapio-empty-icon{font-size:36px;margin-bottom:8px;}
+  .cardapio-empty-text{font-size:13px;font-weight:600;}
 
-  .footer {
-    text-align: center;
-    padding: 16px 0 8px;
-    font-size: 12px;
-    color: #bbb;
-    font-weight: 600;
-  }
+  .cardapio-search{width:100%;border:2px solid #E5E7EB;border-radius:10px;padding:9px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:var(--text);outline:none;margin-bottom:10px;transition:border 0.2s;}
+  .cardapio-search:focus{border-color:var(--blue);}
+
+  .cardapio-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+  .cardapio-item{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:10px 12px;border:2px solid transparent;transition:all 0.15s;}
+  .cardapio-item.selected{border-color:var(--blue);background:var(--blue-light);}
+  .item-cod{font-size:11px;font-weight:900;color:var(--gray);background:white;padding:2px 7px;border-radius:6px;min-width:36px;text-align:center;flex-shrink:0;}
+  .item-desc{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+  .item-valor{font-size:13px;font-weight:900;color:var(--green-dark);flex-shrink:0;}
+  .item-qty{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+  .qty-btn{width:28px;height:28px;border:none;border-radius:8px;background:var(--blue);color:white;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .qty-num{font-size:15px;font-weight:900;color:var(--text);min-width:18px;text-align:center;}
+
+  .carrinho{background:var(--blue-light);border:2px solid var(--blue);border-radius:12px;padding:12px 14px;margin-top:12px;display:none;}
+  .carrinho.show{display:block;}
+  .carrinho-title{font-size:13px;font-weight:900;color:var(--blue-dark);margin-bottom:8px;}
+  .carrinho-item{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+  .carrinho-total{font-size:15px;font-weight:900;color:var(--blue-dark);border-top:1px solid rgba(59,130,246,0.3);padding-top:8px;margin-top:6px;text-align:right;}
+
+  .btn-enviar{width:100%;padding:14px;border:none;border-radius:12px;color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;margin-top:12px;transition:filter 0.2s;}
+  .btn-enviar.blue{background:var(--blue);}
+  .btn-enviar.blue:hover{filter:brightness(0.9);}
+  .btn-enviar:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .dl-option{display:flex;align-items:center;gap:12px;background:var(--purple-light);border:2px solid #DDD6FE;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;}
+  .dl-option:hover{border-color:var(--purple);}
+  .dl-option-icon{font-size:28px;}
+  .dl-option-title{font-size:15px;font-weight:900;color:#5B21B6;display:block;}
+  .dl-option-sub{font-size:12px;font-weight:600;color:#7C3AED;opacity:0.8;}
+  .no-cardapio{text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1A1A2E;color:white;padding:13px 22px;border-radius:14px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(0,0,0,0.3);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:999;text-align:center;max-width:300px;pointer-events:none;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.success{background:var(--green-dark);}
+  .toast.cancel{background:#555;}
+
+  .footer{text-align:center;padding:12px 0 6px;font-size:11px;color:#ccc;font-weight:600;}
 </style>
 </head>
 <body>
@@ -249,48 +126,98 @@
     <div class="logo-icon">🍽️</div>
     <span class="logo-name" id="restaurant-name">Restaurante</span>
   </div>
-  <div class="mesa-badge">
-    📍 Mesa <span class="mesa-num" id="mesa-display">—</span>
-  </div>
+  <div class="mesa-badge">📍 Mesa <span class="mesa-num" id="mesa-display">—</span></div>
 </div>
 
 <div class="main">
-  <div class="greeting">
-    <h2>Como posso ajudar? 😊</h2>
-    <p>Toque em uma opção abaixo</p>
-  </div>
 
   <div class="active-call" id="active-call">
     <div class="active-call-title"><span class="pulse"></span>Chamado enviado!</div>
     <div class="active-call-type" id="active-call-type">—</div>
+    <div class="active-call-obs" id="active-call-obs"></div>
   </div>
 
+  <div class="section-title">O que você precisa?</div>
+
   <div class="btn-grid">
-    <button class="btn-call btn-garcom" onclick="enviarChamado('garcom')">
+    <button class="btn-call btn-garcom" onclick="enviarChamado('garcom','')">
       <div class="btn-icon">🔔</div>
       <div class="btn-text">
         <span class="btn-title">Chamar Garçom</span>
-        <span class="btn-sub">O garçom virá até você</span>
+        <span class="btn-sub">O garçom virá até você agora</span>
       </div>
     </button>
-
-    <button class="btn-call btn-conta" onclick="enviarChamado('conta')">
+    <button class="btn-call btn-conta" onclick="enviarChamado('conta','')">
       <div class="btn-icon">💳</div>
       <div class="btn-text">
         <span class="btn-title">Pedir a Conta</span>
         <span class="btn-sub">Solicitar fechamento da conta</span>
       </div>
     </button>
+  </div>
 
-    <button class="btn-call btn-pedido" onclick="enviarChamado('pedido')">
+  <!-- FAZER PEDIDO -->
+  <div class="expand-section">
+    <button class="expand-header blue" onclick="toggleSection('pedido')">
       <div class="btn-icon">🍽️</div>
       <div class="btn-text">
         <span class="btn-title">Fazer Pedido</span>
-        <span class="btn-sub">Quero pedir algo novo</span>
+        <span class="btn-sub">Cardápio ou solicitação livre</span>
       </div>
+      <span class="expand-chevron" id="chev-pedido">▼</span>
     </button>
+    <div class="expand-body" id="body-pedido">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('livre')" id="tab-livre">✏️ Solicitação Livre</button>
+        <button class="tab" onclick="switchTab('cardapio')" id="tab-cardapio">📋 Cardápio</button>
+      </div>
 
-    <button class="btn-call btn-cancel" onclick="cancelarChamado()" id="btn-cancel">
+      <!-- LIVRE -->
+      <div class="tab-content active" id="content-livre">
+        <span class="obs-label">Descreva seu pedido:</span>
+        <textarea class="obs-textarea" id="obs-livre" placeholder="Ex: 1 cerveja bem gelada&#10;1 suco de laranja natural&#10;Mais guardanapos, por favor..."></textarea>
+        <div class="obs-hint">Seja específico para facilitar o atendimento 😊</div>
+        <button class="btn-enviar blue" onclick="enviarPedidoLivre()">🛎️ Enviar Pedido</button>
+      </div>
+
+      <!-- CARDÁPIO -->
+      <div class="tab-content" id="content-cardapio">
+        <div id="cardapio-vazio" class="cardapio-empty">
+          <div class="cardapio-empty-icon">📋</div>
+          <div class="cardapio-empty-text">O cardápio ainda não foi configurado.<br>Use "Solicitação Livre" ou consulte o garçom.</div>
+        </div>
+        <div id="cardapio-com-itens" style="display:none">
+          <input class="cardapio-search" type="text" placeholder="🔍 Buscar por nome ou código..." oninput="filtrarCardapio(this.value)">
+          <div class="cardapio-list" id="cardapio-list"></div>
+          <div class="carrinho" id="carrinho">
+            <div class="carrinho-title">🛒 Resumo do pedido</div>
+            <div id="carrinho-itens"></div>
+            <div class="carrinho-total" id="carrinho-total"></div>
+          </div>
+          <button class="btn-enviar blue" id="btn-enviar-cardapio" onclick="enviarPedidoCardapio()" disabled>🛎️ Enviar Pedido</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARDÁPIO DIGITAL -->
+  <div class="expand-section">
+    <button class="expand-header purple" onclick="toggleSection('cardapio-dl')">
+      <div class="btn-icon">📥</div>
+      <div class="btn-text">
+        <span class="btn-title">Cardápio Digital</span>
+        <span class="btn-sub">Visualizar ou baixar o cardápio</span>
+      </div>
+      <span class="expand-chevron" id="chev-cardapio-dl">▼</span>
+    </button>
+    <div class="expand-body" id="body-cardapio-dl">
+      <div id="dl-content"></div>
+    </div>
+  </div>
+
+  <!-- CANCELAR -->
+  <div class="btn-grid">
+    <button class="btn-call btn-cancel" onclick="cancelarChamado()">
       <div class="btn-icon">❌</div>
       <div class="btn-text">
         <span class="btn-title">Cancelar Chamado</span>
@@ -305,99 +232,242 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // Pega número da mesa da URL: ?mesa=12
-  const params = new URLSearchParams(window.location.search);
-  const mesa = params.get('mesa') || '1';
-  const nomeRestaurante = params.get('nome') || 'Restaurante';
+const params = new URLSearchParams(window.location.search);
+const mesa = params.get('mesa') || '1';
+const nomeRestaurante = params.get('nome') || 'Restaurante';
+document.getElementById('mesa-display').textContent = mesa;
+document.getElementById('restaurant-name').textContent = nomeRestaurante;
+document.title = `Mesa ${mesa} — ${nomeRestaurante}`;
 
-  document.getElementById('mesa-display').textContent = mesa;
-  document.getElementById('restaurant-name').textContent = nomeRestaurante;
-  document.title = `Mesa ${mesa} — ${nomeRestaurante}`;
+const STORAGE_KEY = 'restaurante_chamados';
+const CARDAPIO_KEY = 'restaurante_cardapio';
+const CARDAPIO_FILE_KEY = 'restaurante_cardapio_arquivo';
+let chamadoAtivo = null;
+let carrinho = {};
 
-  const STORAGE_KEY = 'restaurante_chamados';
-  let chamadoAtivo = null;
+const labels = { garcom:'🔔 Chamar Garçom', conta:'💳 Pedir a Conta', pedido:'🍽️ Pedido' };
 
-  const labels = {
-    garcom: '🔔 Chamar Garçom',
-    conta: '💳 Pedir a Conta',
-    pedido: '🍽️ Fazer Pedido'
-  };
+function getChamados(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
+function saveChamados(arr){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));
+  const bc=new BroadcastChannel('restaurante_updates');
+  bc.postMessage({type:'update'});bc.close();
+}
+function getCardapio(){try{return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]');}catch{return[];}}
 
-  function getChamados() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+function enviarChamado(tipo,obs){
+  const lista=getChamados();
+  const filtrado=lista.filter(c=>c.mesa!==mesa);
+  const novo={id:Date.now(),mesa,tipo,label:labels[tipo],obs:obs||'',
+    hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    timestamp:Date.now(),status:'pendente'};
+  filtrado.push(novo);
+  saveChamados(filtrado);
+  chamadoAtivo=tipo;
+  document.getElementById('active-call-type').textContent=labels[tipo];
+  const obsEl=document.getElementById('active-call-obs');
+  obsEl.textContent=obs?`"${obs.substring(0,80)}${obs.length>80?'...':''}"` :'';
+  document.getElementById('active-call').classList.add('show');
+  mostrarToast('✅ Chamado enviado! O garçom está a caminho.','success');
+}
+
+function enviarPedidoLivre(){
+  const obs=document.getElementById('obs-livre').value.trim();
+  if(!obs){mostrarToast('⚠️ Descreva seu pedido antes de enviar!');return;}
+  enviarChamado('pedido',obs);
+  document.getElementById('obs-livre').value='';
+  fecharSection('pedido');
+}
+
+function enviarPedidoCardapio(){
+  const itens=Object.values(carrinho).filter(c=>c.qty>0);
+  if(!itens.length)return;
+  const obs=itens.map(c=>`${c.qty}x ${c.item.cod} ${c.item.desc}`).join(' | ');
+  enviarChamado('pedido',obs);
+  carrinho={};
+  renderCarrinho();
+  fecharSection('pedido');
+}
+
+function cancelarChamado(){
+  saveChamados(getChamados().filter(c=>c.mesa!==mesa));
+  chamadoAtivo=null;
+  document.getElementById('active-call').classList.remove('show');
+  mostrarToast('Chamado cancelado.','cancel');
+}
+
+// TOGGLE SECTIONS
+function toggleSection(id){
+  const body=document.getElementById('body-'+id);
+  const chev=document.getElementById('chev-'+id);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+  if(!isOpen){
+    if(id==='pedido') renderCardapioTab();
+    if(id==='cardapio-dl') renderCardapioDownload();
   }
-  function saveChamados(arr) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    // Notifica outras abas
-    const bc = new BroadcastChannel('restaurante_updates');
-    bc.postMessage({ type: 'update' });
-    bc.close();
-  }
+}
+function fecharSection(id){
+  document.getElementById('body-'+id).classList.remove('open');
+  document.getElementById('chev-'+id).classList.remove('open');
+}
 
-  function enviarChamado(tipo) {
-    const lista = getChamados();
-    // Remove chamado anterior desta mesa
-    const filtrado = lista.filter(c => c.mesa !== mesa);
-    const novo = {
-      id: Date.now(),
-      mesa: mesa,
-      tipo: tipo,
-      label: labels[tipo],
-      hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      timestamp: Date.now(),
-      status: 'pendente'
-    };
-    filtrado.push(novo);
-    saveChamados(filtrado);
-    chamadoAtivo = tipo;
-    mostrarChamadoAtivo(labels[tipo]);
-    mostrarToast('✅ Chamado enviado! O garçom está a caminho.', 'success');
-  }
+// TABS
+function switchTab(tab){
+  ['livre','cardapio'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('content-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='cardapio') renderCardapioTab();
+}
 
-  function cancelarChamado() {
-    const lista = getChamados();
-    const filtrado = lista.filter(c => c.mesa !== mesa);
-    saveChamados(filtrado);
-    chamadoAtivo = null;
-    document.getElementById('active-call').classList.remove('show');
-    mostrarToast('Chamado cancelado.', 'cancel');
-  }
+// CARDÁPIO TAB
+function renderCardapioTab(){
+  const items=getCardapio();
+  const vazio=document.getElementById('cardapio-vazio');
+  const comItens=document.getElementById('cardapio-com-itens');
+  if(!items.length){vazio.style.display='block';comItens.style.display='none';return;}
+  vazio.style.display='none';comItens.style.display='block';
+  renderListaCardapio(items);
+}
 
-  function mostrarChamadoAtivo(label) {
-    document.getElementById('active-call-type').textContent = label;
+function renderListaCardapio(items){
+  document.getElementById('cardapio-list').innerHTML=items.map(item=>{
+    const qty=carrinho[item.id]?.qty||0;
+    return `<div class="cardapio-item ${qty>0?'selected':''}" id="ci-${item.id}">
+      <span class="item-cod">${item.cod}</span>
+      <span class="item-desc">${item.desc}</span>
+      <span class="item-valor">R$${parseFloat(item.valor).toFixed(2)}</span>
+      <div class="item-qty">
+        <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+        <span class="qty-num" id="qty-${item.id}">${qty}</span>
+        <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarCardapio(q){
+  const items=getCardapio().filter(i=>
+    i.cod.toLowerCase().includes(q.toLowerCase())||
+    i.desc.toLowerCase().includes(q.toLowerCase()));
+  renderListaCardapio(items);
+}
+
+function changeQty(id,delta){
+  const items=getCardapio();
+  const item=items.find(i=>i.id===id);
+  if(!item)return;
+  if(!carrinho[id])carrinho[id]={item,qty:0};
+  carrinho[id].qty=Math.max(0,carrinho[id].qty+delta);
+  if(carrinho[id].qty===0)delete carrinho[id];
+  const qEl=document.getElementById('qty-'+id);
+  const cEl=document.getElementById('ci-'+id);
+  if(qEl)qEl.textContent=carrinho[id]?.qty||0;
+  if(cEl)cEl.classList.toggle('selected',(carrinho[id]?.qty||0)>0);
+  renderCarrinho();
+}
+
+function renderCarrinho(){
+  const itens=Object.values(carrinho).filter(c=>c.qty>0);
+  const c=document.getElementById('carrinho');
+  const btn=document.getElementById('btn-enviar-cardapio');
+  if(!itens.length){c.classList.remove('show');btn.disabled=true;return;}
+  c.classList.add('show');btn.disabled=false;
+  let total=0;
+  document.getElementById('carrinho-itens').innerHTML=itens.map(c=>{
+    const sub=c.qty*parseFloat(c.item.valor);total+=sub;
+    return `<div class="carrinho-item"><span>${c.qty}x ${c.item.desc}</span><span>R$${sub.toFixed(2)}</span></div>`;
+  }).join('');
+  document.getElementById('carrinho-total').textContent=`Total estimado: R$${total.toFixed(2)}`;
+}
+
+// CARDÁPIO DOWNLOAD
+function renderCardapioDownload(){
+  const cont=document.getElementById('dl-content');
+  const arquivo=localStorage.getItem(CARDAPIO_FILE_KEY);
+  const items=getCardapio();
+  let html='';
+  if(arquivo){
+    const ext=arquivo.split(';')[0].split('/')[1];
+    const isPdf=ext==='pdf';
+    html+=`<div class="dl-option" onclick="baixarArquivo()">
+      <span class="dl-option-icon">${isPdf?'📄':'🖼️'}</span>
+      <div><span class="dl-option-title">${isPdf?'Baixar Cardápio PDF':'Ver Imagem do Cardápio'}</span>
+      <span class="dl-option-sub">Toque para abrir o arquivo</span></div></div>`;
+  }
+  if(items.length){
+    html+=`<div class="dl-option" onclick="verCardapioOnline()">
+      <span class="dl-option-icon">📋</span>
+      <div><span class="dl-option-title">Ver Cardápio Online</span>
+      <span class="dl-option-sub">${items.length} item(s) no cardápio digital</span></div></div>`;
+  }
+  if(!arquivo&&!items.length){
+    html='<div class="no-cardapio">📭 Cardápio ainda não disponível.<br>Consulte o garçom.</div>';
+  }
+  cont.innerHTML=html;
+}
+
+function baixarArquivo(){
+  const arquivo=localStorage.getItem(CARDAPIO_FILE_KEY);
+  if(!arquivo)return;
+  const link=document.createElement('a');
+  link.href=arquivo;link.download='cardapio';link.click();
+}
+
+function verCardapioOnline(){
+  const items=getCardapio();
+  if(!items.length)return;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cardápio — ${nomeRestaurante}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>body{font-family:'Nunito',sans-serif;background:#F9F6F2;padding:20px;max-width:500px;margin:0 auto;}
+  h1{font-size:24px;font-weight:900;color:#1A1A2E;margin-bottom:4px;}
+  .sub{font-size:14px;color:#6B7280;font-weight:600;margin-bottom:20px;}
+  .item{background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+  .cod{background:#EFF6FF;color:#2563EB;font-size:12px;font-weight:900;padding:4px 8px;border-radius:6px;flex-shrink:0;}
+  .desc{flex:1;font-size:15px;font-weight:700;color:#1A1A2E;}
+  .val{font-size:16px;font-weight:900;color:#1FA870;flex-shrink:0;}
+  </style></head><body>
+  <h1>🍽️ ${nomeRestaurante}</h1><div class="sub">Cardápio Digital — Mesa ${mesa}</div>
+  ${items.map(i=>`<div class="item"><span class="cod">${i.cod}</span><span class="desc">${i.desc}</span><span class="val">R$${parseFloat(i.valor).toFixed(2)}</span></div>`).join('')}
+  </body></html>`);
+  w.document.close();
+}
+
+function mostrarToast(msg,tipo=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+tipo;
+  setTimeout(()=>{t.className='toast '+tipo;},3000);
+}
+
+// Init
+function verificarChamadoAtivo(){
+  const lista=getChamados();
+  const meu=lista.find(c=>c.mesa===mesa&&c.status==='pendente');
+  if(meu){
+    chamadoAtivo=meu.tipo;
+    document.getElementById('active-call-type').textContent=meu.label;
+    const obsEl=document.getElementById('active-call-obs');
+    obsEl.textContent=meu.obs?`"${meu.obs.substring(0,80)}"` :'';
     document.getElementById('active-call').classList.add('show');
   }
+}
 
-  function mostrarToast(msg, tipo='') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show ' + tipo;
-    setTimeout(() => { t.className = 'toast ' + tipo; }, 3000);
+const bc=new BroadcastChannel('restaurante_updates');
+bc.onmessage=()=>{
+  const lista=getChamados();
+  if(!lista.find(c=>c.mesa===mesa)&&chamadoAtivo){
+    chamadoAtivo=null;
+    document.getElementById('active-call').classList.remove('show');
+    mostrarToast('✅ Chamado atendido!','success');
   }
+};
 
-  // Ao carregar, verifica se já tem chamado ativo desta mesa
-  function verificarChamadoAtivo() {
-    const lista = getChamados();
-    const meu = lista.find(c => c.mesa === mesa && c.status === 'pendente');
-    if (meu) {
-      chamadoAtivo = meu.tipo;
-      mostrarChamadoAtivo(meu.label);
-    }
-  }
-
-  // Escuta quando o chamado for atendido pelo painel
-  const bc = new BroadcastChannel('restaurante_updates');
-  bc.onmessage = () => {
-    const lista = getChamados();
-    const meu = lista.find(c => c.mesa === mesa);
-    if (!meu && chamadoAtivo) {
-      chamadoAtivo = null;
-      document.getElementById('active-call').classList.remove('show');
-      mostrarToast('✅ Garçom a caminho! Chamado atendido.', 'success');
-    }
-  };
-
-  verificarChamadoAtivo();
+verificarChamadoAtivo();
 </script>
 </body>
 </html>

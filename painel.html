@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel do Restaurante</title>
+<title>Painel — Garçom Digital</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -18,29 +18,29 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
 
-  /* TOPBAR */
   .topbar{background:var(--text);color:white;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
   .topbar-left{display:flex;align-items:center;gap:12px;}
   .topbar-logo{width:38px;height:38px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
   .topbar-title{font-size:18px;font-weight:900;}
   .topbar-sub{font-size:12px;color:rgba(255,255,255,0.5);font-weight:600;}
   .topbar-right{display:flex;align-items:center;gap:12px;}
-  .live-dot{display:flex;align-items:center;gap:6px;background:rgba(46,201,138,0.2);color:#2EC98A;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:700;}
-  .live-dot span{width:7px;height:7px;background:#2EC98A;border-radius:50%;animation:blink 1.5s infinite;display:inline-block;}
+  .live-dot{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:700;transition:all 0.3s;}
+  .live-dot.online{background:rgba(46,201,138,0.2);color:#2EC98A;}
+  .live-dot.offline{background:rgba(239,68,68,0.2);color:#EF4444;}
+  .live-dot span{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .live-dot.online span{background:#2EC98A;animation:blink 1.5s infinite;}
+  .live-dot.offline span{background:#EF4444;}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
   .clock{font-size:16px;font-weight:700;color:white;}
 
-  /* NAV TABS */
   .nav-tabs{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0;}
   .nav-tab{padding:14px 20px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--gray);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all 0.2s;margin-bottom:-2px;}
   .nav-tab:hover{color:var(--text);}
   .nav-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
 
-  /* PAGE CONTENT */
   .page{display:none;padding:20px 24px 40px;}
   .page.active{display:block;}
 
-  /* SETTINGS */
   .settings-row{background:var(--card);border-radius:14px;padding:16px 20px;margin-bottom:14px;box-shadow:var(--shadow);}
   .settings-row-title{font-size:13px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
   .form-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
@@ -56,17 +56,12 @@
   .btn.green{background:var(--green);color:white;}
   .btn.red{background:var(--red-light);color:var(--red);border:2px solid var(--red);}
   .btn.red:hover{background:var(--red);color:white;}
-  .btn.gray{background:var(--border);color:var(--gray);}
 
-  /* ADDR BAR */
-  .addr-bar{background:#1A1A2E;padding:12px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--orange);}
-  .addr-label{font-size:12px;font-weight:700;color:var(--orange);white-space:nowrap;}
-  .addr-input{flex:1;min-width:200px;border:2px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:white;background:rgba(255,255,255,0.08);outline:none;transition:border 0.2s;}
-  .addr-input:focus{border-color:var(--orange);}
-  .addr-input::placeholder{color:rgba(255,255,255,0.3);}
-  .addr-preview{font-size:11px;color:rgba(255,255,255,0.4);font-weight:600;flex-basis:100%;}
+  /* STATUS SUPABASE */
+  .supabase-status{background:var(--blue-light);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:10px 16px;margin:0;font-size:13px;font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:8px;}
+  .supabase-status.ok{background:var(--green-light);border-left-color:var(--green);color:var(--green-dark);}
+  .supabase-status.erro{background:var(--red-light);border-left-color:var(--red);color:var(--red-dark);}
 
-  /* STATS */
   .stats{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
   .stat{background:var(--card);border-radius:12px;padding:14px 18px;min-width:130px;box-shadow:var(--shadow);border-left:4px solid transparent;flex:1;}
   .stat.orange{border-left-color:var(--orange);}
@@ -76,7 +71,6 @@
   .stat-num{font-size:28px;font-weight:900;color:var(--text);line-height:1;margin-bottom:3px;}
   .stat-label{font-size:12px;color:var(--gray);font-weight:600;}
 
-  /* CHAMADOS */
   .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
   .section-title{font-size:16px;font-weight:900;color:var(--text);}
   .section-sub{font-size:12px;color:var(--gray);font-weight:600;margin-top:2px;}
@@ -89,7 +83,7 @@
   .chamado-card.garcom{border-color:var(--orange);background:linear-gradient(135deg,white 60%,var(--orange-light));}
   .chamado-card.conta{border-color:var(--green);background:linear-gradient(135deg,white 60%,var(--green-light));}
   .chamado-card.pedido{border-color:var(--blue);background:linear-gradient(135deg,white 60%,var(--blue-light));}
-  .chamado-card.urgente{animation:urgente 0.8s ease infinite alternate;}
+  .chamado-card.urgente{border-color:var(--red)!important;animation:urgente 0.8s ease infinite alternate;}
   @keyframes urgente{from{box-shadow:0 0 0 0 rgba(239,68,68,0.3);}to{box-shadow:0 0 0 8px rgba(239,68,68,0);}}
 
   .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
@@ -102,8 +96,7 @@
   .conta .tipo-label{background:var(--green-light);color:var(--green-dark);}
   .pedido .tipo-label{background:var(--blue-light);color:var(--blue-dark);}
 
-  .card-obs{font-size:12px;font-weight:600;color:var(--text);background:rgba(0,0,0,0.04);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-style:italic;word-break:break-word;display:none;}
-  .card-obs.show{display:block;}
+  .card-obs{font-size:12px;font-weight:600;color:var(--text);background:rgba(0,0,0,0.04);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-style:italic;word-break:break-word;}
 
   .card-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
   .hora-chamado{font-size:12px;color:var(--gray);font-weight:600;}
@@ -122,19 +115,16 @@
   .empty-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:6px;}
   .empty-sub{font-size:14px;font-weight:600;}
 
-  /* HISTÓRICO */
   .history-list{display:flex;flex-direction:column;gap:7px;}
-  .history-item{background:var(--card);border-radius:10px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--gray);box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+  .history-item{background:var(--card);border-radius:10px;padding:11px 14px;display:flex;align-items:flex-start;justify-content:space-between;font-size:13px;font-weight:600;color:var(--gray);box-shadow:0 1px 6px rgba(0,0,0,0.05);gap:10px;}
   .history-item .mesa{color:var(--text);font-weight:700;}
-  .history-item .obs-hist{font-size:11px;color:var(--gray);margin-top:2px;font-style:italic;}
+  .history-obs{font-size:11px;color:var(--gray);margin-top:2px;font-style:italic;}
 
-  /* CARDÁPIO */
-  .cardapio-table{width:100%;border-collapse:collapse;margin-top:4px;}
+  .cardapio-table{width:100%;border-collapse:collapse;}
   .cardapio-table th{text-align:left;padding:10px 12px;font-size:12px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);}
   .cardapio-table td{padding:10px 12px;font-size:14px;font-weight:600;border-bottom:1px solid var(--border);vertical-align:middle;}
   .cardapio-table tr:last-child td{border-bottom:none;}
   .cardapio-table tr:hover td{background:var(--bg);}
-  .item-actions{display:flex;gap:6px;}
   .btn-sm{padding:5px 12px;font-size:12px;border:none;border-radius:7px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;}
   .btn-sm.red{background:var(--red-light);color:var(--red);}
   .btn-sm.red:hover{background:var(--red);color:white;}
@@ -142,9 +132,7 @@
   .add-item-form{background:var(--bg);border-radius:12px;padding:14px;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
   .add-item-form .form-group{display:flex;flex-direction:column;gap:4px;}
   .add-item-form label{font-size:12px;font-weight:700;color:var(--gray);}
-  .add-item-form .form-input{padding:8px 12px;font-size:14px;}
 
-  /* UPLOAD CARDÁPIO */
   .upload-area{border:2px dashed var(--purple);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:background 0.2s;margin-top:12px;}
   .upload-area:hover{background:var(--purple-light);}
   .upload-icon{font-size:36px;margin-bottom:8px;}
@@ -153,7 +141,6 @@
   .file-preview{background:var(--purple-light);border:2px solid #DDD6FE;border-radius:10px;padding:12px 16px;margin-top:10px;display:flex;align-items:center;justify-content:space-between;}
   .file-preview-name{font-size:13px;font-weight:700;color:#5B21B6;}
 
-  /* MODAL QR */
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:20px;}
   .modal-overlay.show{display:flex;}
   .modal{background:white;border-radius:20px;padding:28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
@@ -162,9 +149,8 @@
   .modal p{font-size:13px;color:var(--gray);font-weight:600;margin-bottom:16px;}
   #qr-container{background:var(--bg);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;}
 
-  /* Etiqueta QR */
   .qr-etiqueta{background:var(--text);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center;}
-  .qr-etiqueta-msg{color:white;font-size:14px;font-weight:900;margin-bottom:8px;letter-spacing:0.3px;}
+  .qr-etiqueta-msg{color:white;font-size:13px;font-weight:900;margin-bottom:8px;}
   .qr-etiqueta-mesa{color:var(--orange);font-size:22px;font-weight:900;}
   .qr-etiqueta-sub{color:rgba(255,255,255,0.6);font-size:11px;font-weight:600;margin-top:4px;}
 
@@ -173,58 +159,38 @@
   .btn-fechar{flex:1;padding:11px;border:2px solid var(--border);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--gray);}
   .btn-copiar{flex:1;padding:11px;border:none;border-radius:10px;background:var(--orange);color:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
 
-  /* ALERT */
-  .alert-banner{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--orange);color:white;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:900;z-index:150;box-shadow:0 8px 32px rgba(255,107,53,0.4);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;text-align:center;}
+  .alert-banner{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--orange);color:white;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:900;z-index:150;box-shadow:0 8px 32px rgba(255,107,53,0.4);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;text-align:center;max-width:90%;}
   .alert-banner.show{transform:translateX(-50%) translateY(0);}
-
-  .info-box{background:var(--blue-light);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:12px 16px;margin:12px 0;font-size:13px;font-weight:600;color:#1e40af;display:none;}
-  .info-box.show{display:block;}
-  .info-box strong{font-weight:900;display:block;margin-bottom:3px;}
-  .info-box code{background:rgba(59,130,246,0.12);padding:1px 6px;border-radius:5px;font-family:monospace;}
 </style>
 </head>
 <body>
 
 <div class="alert-banner" id="alert-banner"></div>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-left">
     <div class="topbar-logo">🍽️</div>
     <div>
-      <div class="topbar-title" id="topbar-name">Painel do Restaurante</div>
-      <div class="topbar-sub">Atualização em tempo real</div>
+      <div class="topbar-title" id="topbar-name">Painel — Garçom Digital</div>
+      <div class="topbar-sub">Supabase • Tempo real</div>
     </div>
   </div>
   <div class="topbar-right">
-    <div class="live-dot"><span></span>AO VIVO</div>
+    <div class="live-dot offline" id="live-dot"><span></span><span id="live-txt">Conectando...</span></div>
     <div class="clock" id="clock">00:00:00</div>
   </div>
 </div>
 
-<!-- ADDR BAR -->
-<div class="addr-bar">
-  <span class="addr-label">🌐 Endereço base:</span>
-  <input class="addr-input" type="text" id="cfg-base-url" placeholder="Ex: http://192.168.0.117:5500  ou  https://meu-site.netlify.app" oninput="atualizarPreview()">
-  <button class="btn orange" onclick="aplicarEndereco()" style="font-size:13px">✅ Aplicar</button>
-  <button class="btn blue" style="font-size:13px" onclick="toggleInfo()">❓ Ajuda</button>
-  <div class="addr-preview" id="addr-preview"></div>
-</div>
-<div class="info-box" id="info-local" style="margin:0;border-radius:0;padding:12px 24px;">
-  <strong>💡 Como descobrir seu IP local (Windows):</strong>
-  Abra o Prompt de Comando e digite <code>ipconfig</code> → procure <strong>Endereço IPv4</strong> (ex: 192.168.0.117)<br>
-  Depois preencha acima: <code>http://192.168.0.117:PORTA</code> — Live Server = 5500, http-server = 8080
-</div>
+<div class="supabase-status" id="supabase-status">⏳ Conectando ao banco de dados...</div>
 
-<!-- NAV TABS -->
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showPage('chamados')">📋 Chamados</button>
-  <button class="nav-tab" onclick="showPage('cardapio')">🍽️ Cardápio</button>
-  <button class="nav-tab" onclick="showPage('qrcodes')">📱 QR Codes</button>
-  <button class="nav-tab" onclick="showPage('config')">⚙️ Config</button>
+  <button class="nav-tab active" onclick="showPage('chamados',this)">📋 Chamados</button>
+  <button class="nav-tab" onclick="showPage('cardapio',this)">🍽️ Cardápio</button>
+  <button class="nav-tab" onclick="showPage('qrcodes',this)">📱 QR Codes</button>
+  <button class="nav-tab" onclick="showPage('config',this)">⚙️ Config</button>
 </div>
 
-<!-- PAGE: CHAMADOS -->
+<!-- CHAMADOS -->
 <div class="page active" id="page-chamados">
   <div class="stats">
     <div class="stat orange"><div class="stat-num" id="stat-pendentes">0</div><div class="stat-label">Pendentes</div></div>
@@ -232,7 +198,6 @@
     <div class="stat blue"><div class="stat-num" id="stat-mesas">0</div><div class="stat-label">Mesas Ativas</div></div>
     <div class="stat purple"><div class="stat-num" id="stat-pedidos">0</div><div class="stat-label">Pedidos</div></div>
   </div>
-
   <div class="section-header">
     <div>
       <div class="section-title">📋 Chamados em Aberto</div>
@@ -240,25 +205,23 @@
     </div>
     <button class="btn red" onclick="limparTudo()">🗑️ Limpar Tudo</button>
   </div>
-
   <div class="empty-state show" id="empty-state">
     <div class="empty-icon">✅</div>
     <div class="empty-title">Tudo tranquilo!</div>
-    <div class="empty-sub">Nenhum chamado pendente no momento.</div>
+    <div class="empty-sub">Nenhum chamado pendente.</div>
   </div>
   <div class="chamados-grid" id="chamados-grid"></div>
-
   <div id="history-section" style="display:none;margin-top:28px;">
     <div class="section-title" style="margin-bottom:12px">📜 Histórico de Hoje</div>
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
-<!-- PAGE: CARDÁPIO -->
+<!-- CARDÁPIO -->
 <div class="page" id="page-cardapio">
   <div class="settings-row">
     <div class="settings-row-title">📤 Upload do Cardápio (PDF ou Imagem)</div>
-    <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:10px">Faça upload do PDF ou imagem do seu cardápio para o cliente baixar/visualizar pelo celular.</p>
+    <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:10px">O cliente poderá visualizar ou baixar pelo celular.</p>
     <div class="upload-area" onclick="document.getElementById('file-upload').click()">
       <div class="upload-icon">📂</div>
       <div class="upload-text">Clique para selecionar arquivo</div>
@@ -270,40 +233,32 @@
       <button class="btn-sm red" onclick="removerArquivo()">✕ Remover</button>
     </div>
   </div>
-
   <div class="settings-row">
     <div class="settings-row-title">📋 Itens do Cardápio Digital</div>
-    <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:10px">Cadastre os itens para que o cliente possa montar o pedido pelo celular.</p>
-
-    <div id="cardapio-table-wrap">
-      <div id="cardapio-empty-msg" style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado ainda.</div>
-      <table class="cardapio-table" id="cardapio-table" style="display:none">
-        <thead><tr>
-          <th>Código</th><th>Descrição</th><th>Valor (R$)</th><th></th>
-        </tr></thead>
-        <tbody id="cardapio-tbody"></tbody>
-      </table>
-    </div>
-
+    <div id="cardapio-empty-msg" style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado ainda.</div>
+    <table class="cardapio-table" id="cardapio-table" style="display:none">
+      <thead><tr><th>Código</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <tbody id="cardapio-tbody"></tbody>
+    </table>
     <div class="add-item-form">
       <div class="form-group">
         <label>Código</label>
         <input class="form-input" type="text" id="new-cod" placeholder="001" style="width:80px" maxlength="10">
       </div>
       <div class="form-group" style="flex:1">
-        <label>Descrição do Item</label>
+        <label>Descrição</label>
         <input class="form-input wide" type="text" id="new-desc" placeholder="Ex: Cerveja 600ml gelada">
       </div>
       <div class="form-group">
         <label>Valor R$</label>
         <input class="form-input" type="number" id="new-valor" placeholder="0.00" step="0.01" min="0" style="width:100px">
       </div>
-      <button class="btn green" onclick="adicionarItem()">+ Adicionar</button>
+      <button class="btn green" onclick="adicionarItem()" style="margin-top:18px">+ Adicionar</button>
     </div>
   </div>
 </div>
 
-<!-- PAGE: QR CODES -->
+<!-- QR CODES -->
 <div class="page" id="page-qrcodes">
   <div class="settings-row">
     <div class="settings-row-title">📱 Gerar QR Code por Mesa</div>
@@ -312,11 +267,7 @@
       <input class="form-input sm" type="number" id="cfg-mesa" value="1" min="1" max="99">
       <button class="btn orange" onclick="gerarQR()">📱 Gerar QR Code</button>
     </div>
-    <p style="font-size:12px;color:var(--gray);font-weight:600;margin-top:10px">
-      💡 Gere um QR Code para cada mesa, imprima e cole. O cliente escaneia e faz o chamado sem instalar nada.
-    </p>
   </div>
-
   <div class="settings-row">
     <div class="settings-row-title">⚡ Gerar Vários de Uma Vez</div>
     <div class="form-row">
@@ -327,7 +278,6 @@
       <button class="btn blue" onclick="gerarMultiplosQR()">🖨️ Gerar Todos</button>
     </div>
   </div>
-
   <div id="multi-qr-area" style="display:none;margin-top:16px;">
     <div class="section-title" style="margin-bottom:14px">QR Codes Gerados</div>
     <div id="multi-qr-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
@@ -335,7 +285,7 @@
   </div>
 </div>
 
-<!-- PAGE: CONFIG -->
+<!-- CONFIG -->
 <div class="page" id="page-config">
   <div class="settings-row">
     <div class="settings-row-title">🏪 Nome do Restaurante</div>
@@ -345,13 +295,12 @@
   </div>
   <div class="settings-row">
     <div class="settings-row-title">💬 Mensagem no QR Code</div>
-    <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:10px">Texto que aparece na etiqueta impressa com o QR Code.</p>
     <input class="form-input" style="width:100%" type="text" id="cfg-msg-qr" value="📱 Escaneie para Chamar o Garçom / Fazer Pedido" oninput="salvarConfig()">
   </div>
   <div class="settings-row">
     <div class="settings-row-title">🔴 Zona de Perigo</div>
     <div class="form-row">
-      <button class="btn red" onclick="limparHistorico()">🗑️ Limpar Histórico</button>
+      <button class="btn red" onclick="limparHistoricoLocal()">🗑️ Limpar Histórico</button>
       <button class="btn red" onclick="limparCardapio()">🗑️ Limpar Cardápio</button>
       <button class="btn red" onclick="limparTudo()">🗑️ Limpar Chamados</button>
     </div>
@@ -362,15 +311,12 @@
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h3>📱 QR Code — Mesa <span id="qr-mesa-num"></span></h3>
-    <p>Imprima e cole na mesa. O cliente escaneia e faz o chamado.</p>
-    <div id="qr-aviso" style="display:none;background:var(--red-light);border:2px solid var(--red);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--red-dark);">
-      ⚠️ Link local detectado! Preencha o campo "Endereço base" para que o celular consiga acessar.
-    </div>
-    <div class="qr-etiqueta" id="qr-etiqueta">
-      <div class="qr-etiqueta-msg" id="qr-etiqueta-msg">📱 Escaneie para Chamar o Garçom</div>
+    <p>Imprima e cole na mesa.</p>
+    <div class="qr-etiqueta">
+      <div class="qr-etiqueta-msg" id="qr-etiqueta-msg"></div>
       <div id="qr-container"></div>
       <div class="qr-etiqueta-mesa">Mesa <span id="qr-mesa-num2"></span></div>
-      <div class="qr-etiqueta-sub" id="qr-nome-rest">Restaurante</div>
+      <div class="qr-etiqueta-sub" id="qr-nome-rest"></div>
     </div>
     <div class="link-box" id="qr-link-box"></div>
     <div class="modal-btns">
@@ -382,44 +328,55 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-const STORAGE_KEY='restaurante_chamados';
-const HISTORY_KEY='restaurante_historico';
-const CONFIG_KEY='restaurante_config';
+// ========== SUPABASE CONFIG ==========
+const SUPABASE_URL = 'https://mgqwhjjqkhrivgogwtdf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ncXdoampxa2hyaXZnb2d3dGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MDg2MDMsImV4cCI6MjA5Mzk4NDYwM30.OOt4zd1fTeogLm848KNW7a09pxDL1BMsJWYWrGI6s5I';
+const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+
 const CARDAPIO_KEY='restaurante_cardapio';
 const CARDAPIO_FILE_KEY='restaurante_cardapio_arquivo';
-let atendidosHoje=0, ultimaQtd=0;
-let baseUrlCustom='';
+const CONFIG_KEY='restaurante_config';
+const HISTORY_KEY='restaurante_historico';
+
+let atendidosHoje=0;
+let chamadosAnteriores=new Set();
 let qrLinkAtual='';
+let online=false;
 
-// CONFIG
-function getConfig(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}');}catch{return{};}}
-function salvarConfig(){
-  const cfg={
-    nome:document.getElementById('cfg-nome').value||'Restaurante',
-    msgQr:document.getElementById('cfg-msg-qr').value||'📱 Escaneie para Chamar o Garçom / Fazer Pedido'
-  };
-  localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
-  document.getElementById('topbar-name').textContent='Painel — '+cfg.nome;
+// ========== API ==========
+async function apiGet(path){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:HEADERS});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
 }
-function carregarConfig(){
-  const cfg=getConfig();
-  if(cfg.nome){document.getElementById('cfg-nome').value=cfg.nome;document.getElementById('topbar-name').textContent='Painel — '+cfg.nome;}
-  if(cfg.msgQr)document.getElementById('cfg-msg-qr').value=cfg.msgQr;
+async function apiDelete(path){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{method:'DELETE',headers:HEADERS});
+  if(!r.ok)throw new Error(await r.text());
 }
 
-// DATA
-function getChamados(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
-function saveChamados(arr){localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));notificar();}
-function getHistorico(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch{return[];}}
-function getCardapio(){try{return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]');}catch{return[];}}
-function saveCardapio(arr){localStorage.setItem(CARDAPIO_KEY,JSON.stringify(arr));}
-function notificar(){const bc=new BroadcastChannel('restaurante_updates');bc.postMessage({type:'update'});bc.close();}
+// ========== STATUS ==========
+function setOnline(ok){
+  online=ok;
+  const dot=document.getElementById('live-dot');
+  const txt=document.getElementById('live-txt');
+  const status=document.getElementById('supabase-status');
+  if(ok){
+    dot.className='live-dot online';txt.textContent='AO VIVO';
+    status.className='supabase-status ok';
+    status.textContent='✅ Conectado ao Supabase — atualizações em tempo real';
+  } else {
+    dot.className='live-dot offline';txt.textContent='Desconectado';
+    status.className='supabase-status erro';
+    status.textContent='❌ Erro de conexão — tentando reconectar...';
+  }
+}
 
-// CLOCK
+// ========== CLOCK ==========
 setInterval(()=>{
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
 
+// ========== HELPERS ==========
 function tempoDecorrido(ts){
   const d=Math.floor((Date.now()-ts)/1000);
   return `${String(Math.floor(d/60)).padStart(2,'0')}:${String(d%60).padStart(2,'0')}`;
@@ -428,33 +385,13 @@ function getTipoInfo(tipo){
   return {garcom:{emoji:'🔔',label:'Garçom',classe:'garcom'},conta:{emoji:'💳',label:'Conta',classe:'conta'},pedido:{emoji:'🍽️',label:'Pedido',classe:'pedido'}}[tipo]||{emoji:'🔔',label:'Garçom',classe:'garcom'};
 }
 
-// ATENDER
-function atender(id){
-  const lista=getChamados();
-  const chamado=lista.find(c=>c.id===id);
-  saveChamados(lista.filter(c=>c.id!==id));
-  if(chamado){
-    const hist=getHistorico();
-    hist.unshift({...chamado,horaAtendido:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
-    if(hist.length>30)hist.length=30;
-    localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));
-    atendidosHoje++;
-  }
-  renderizar();
-}
-
-function limparTudo(){if(confirm('Limpar todos os chamados?')){saveChamados([]);renderizar();}}
-function limparHistorico(){if(confirm('Limpar histórico?')){localStorage.removeItem(HISTORY_KEY);renderizar();}}
-function limparCardapio(){if(confirm('Limpar todo o cardápio?')){saveCardapio([]);renderCardapio();mostrarAlerta('Cardápio limpo!');}}
-
-// SOM
+// ========== SOM ==========
 function tocarSom(){
   try{
     const ctx=new(window.AudioContext||window.webkitAudioContext)();
     [880,1100].forEach((f,i)=>{
       const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);
-      o.frequency.value=f;o.type='sine';
+      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
       g.gain.setValueAtTime(0.3,ctx.currentTime+i*0.15);
       g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.15+0.3);
       o.start(ctx.currentTime+i*0.15);o.stop(ctx.currentTime+i*0.15+0.35);
@@ -468,86 +405,138 @@ function mostrarAlerta(txt){
   setTimeout(()=>b.classList.remove('show'),3500);
 }
 
-// RENDER CHAMADOS
-function renderizar(){
-  const lista=getChamados();
-  const grid=document.getElementById('chamados-grid');
-  const empty=document.getElementById('empty-state');
-
-  // Stats
-  const pedidos=lista.filter(c=>c.tipo==='pedido').length;
-  document.getElementById('stat-pendentes').textContent=lista.length;
-  document.getElementById('stat-atendidos').textContent=atendidosHoje;
-  document.getElementById('stat-mesas').textContent=new Set(lista.map(c=>c.mesa)).size;
-  document.getElementById('stat-pedidos').textContent=pedidos;
-
-  if(!lista.length){grid.innerHTML='';empty.classList.add('show');}
-  else empty.classList.remove('show');
-
-  const ordenado=[...lista].sort((a,b)=>a.timestamp-b.timestamp);
-  const idsAtuais=new Set(ordenado.map(c=>String(c.id)));
-  grid.querySelectorAll('.chamado-card').forEach(el=>{if(!idsAtuais.has(el.dataset.id))el.remove();});
-
-  ordenado.forEach(c=>{
-    const info=getTipoInfo(c.tipo);
-    const urgente=(Date.now()-c.timestamp)>120000;
-    let card=grid.querySelector(`[data-id="${c.id}"]`);
-    if(!card){
-      card=document.createElement('div');
-      card.className=`chamado-card ${info.classe}`;
-      card.dataset.id=c.id;
-      grid.appendChild(card);
-    }
-    card.classList.toggle('urgente',urgente);
-    card.innerHTML=`
-      <div class="card-top">
-        <div><div class="mesa-lbl">MESA</div><div class="mesa-big">${c.mesa}</div></div>
-        <div class="tipo-badge"><div class="tipo-emoji">${info.emoji}</div><div class="tipo-label">${info.label}</div></div>
-      </div>
-      ${c.obs?`<div class="card-obs show">💬 ${c.obs}</div>`:''}
-      <div class="card-info">
-        <div class="hora-chamado">⏰ ${c.hora}</div>
-        <div><div class="tempo-decorrido" id="tempo-${c.id}">${tempoDecorrido(c.timestamp)}</div><div class="tempo-lbl">aguardando</div></div>
-      </div>
-      <button class="btn-atender" onclick="atender(${c.id})">✅ Marcar como Atendido</button>`;
-  });
-
-  // Histórico
-  const hist=getHistorico();
-  const hs=document.getElementById('history-section');
-  const hl=document.getElementById('history-list');
-  if(hist.length){
-    hs.style.display='block';
-    hl.innerHTML=hist.slice(0,10).map(h=>{
-      const info=getTipoInfo(h.tipo);
-      return `<div class="history-item">
-        <div><span class="mesa">Mesa ${h.mesa} — ${info.emoji} ${info.label}</span>
-        ${h.obs?`<div class="obs-hist">"${h.obs.substring(0,60)}"</div>`:''}
-        </div>
-        <span>${h.hora} → ✅ ${h.horaAtendido}</span>
-      </div>`;
-    }).join('');
-  } else hs.style.display='none';
-
-  ultimaQtd=lista.length;
+// ========== ATENDER ==========
+async function atender(id, mesa, tipo){
+  try {
+    await apiDelete(`chamados?id=eq.${id}`);
+    // Salva histórico local
+    const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    hist.unshift({id,mesa,tipo,label:getTipoInfo(tipo).label,horaAtendido:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+    if(hist.length>30)hist.length=30;
+    localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));
+    atendidosHoje++;
+    renderizar();
+  } catch(e){mostrarAlerta('❌ Erro ao atender chamado.');}
 }
 
-setInterval(()=>{getChamados().forEach(c=>{const el=document.getElementById('tempo-'+c.id);if(el)el.textContent=tempoDecorrido(c.timestamp);});},1000);
-setInterval(renderizar,3000);
+async function limparTudo(){
+  if(!confirm('Limpar todos os chamados do banco de dados?'))return;
+  try{
+    await apiDelete('chamados?status=eq.pendente');
+    renderizar();
+  }catch(e){mostrarAlerta('❌ Erro ao limpar.');}
+}
 
-const bc=new BroadcastChannel('restaurante_updates');
-bc.onmessage=()=>{
-  const lista=getChamados();
-  if(lista.length>ultimaQtd){
-    tocarSom();
-    const novo=[...lista].sort((a,b)=>b.timestamp-a.timestamp)[0];
-    const info=getTipoInfo(novo.tipo);
-    mostrarAlerta(`🔔 MESA ${novo.mesa} — ${info.label.toUpperCase()}!${novo.obs?' "'+novo.obs.substring(0,30)+'"':''}`);
+// ========== RENDER CHAMADOS ==========
+async function renderizar(){
+  try {
+    const lista=await apiGet('chamados?status=eq.pendente&order=timestamp.asc');
+    setOnline(true);
+
+    // Detecta novos chamados
+    const idsNovos=new Set(lista.map(c=>String(c.id)));
+    lista.forEach(c=>{
+      if(!chamadosAnteriores.has(String(c.id))){
+        tocarSom();
+        const info=getTipoInfo(c.tipo);
+        mostrarAlerta(`🔔 MESA ${c.mesa} — ${info.label.toUpperCase()}!${c.obs?' "'+c.obs.substring(0,25)+'"':''}`);
+      }
+    });
+    chamadosAnteriores=idsNovos;
+
+    // Stats
+    document.getElementById('stat-pendentes').textContent=lista.length;
+    document.getElementById('stat-atendidos').textContent=atendidosHoje;
+    document.getElementById('stat-mesas').textContent=new Set(lista.map(c=>c.mesa)).size;
+    document.getElementById('stat-pedidos').textContent=lista.filter(c=>c.tipo==='pedido').length;
+
+    const grid=document.getElementById('chamados-grid');
+    const empty=document.getElementById('empty-state');
+
+    if(!lista.length){grid.innerHTML='';empty.classList.add('show');}
+    else empty.classList.remove('show');
+
+    // Remove cards que não existem mais
+    const idsAtuais=new Set(lista.map(c=>String(c.id)));
+    grid.querySelectorAll('.chamado-card').forEach(el=>{if(!idsAtuais.has(el.dataset.id))el.remove();});
+
+    lista.forEach(c=>{
+      const info=getTipoInfo(c.tipo);
+      const urgente=(Date.now()-c.timestamp)>120000;
+      let card=grid.querySelector(`[data-id="${c.id}"]`);
+      if(!card){
+        card=document.createElement('div');
+        card.className=`chamado-card ${info.classe}`;
+        card.dataset.id=c.id;
+        grid.appendChild(card);
+      }
+      card.classList.toggle('urgente',urgente);
+      card.innerHTML=`
+        <div class="card-top">
+          <div><div class="mesa-lbl">MESA</div><div class="mesa-big">${c.mesa}</div></div>
+          <div class="tipo-badge"><div class="tipo-emoji">${info.emoji}</div><div class="tipo-label">${info.label}</div></div>
+        </div>
+        ${c.obs?`<div class="card-obs">💬 ${c.obs}</div>`:''}
+        <div class="card-info">
+          <div class="hora-chamado">⏰ ${c.hora||'—'}</div>
+          <div><div class="tempo-decorrido" id="tempo-${c.id}">${tempoDecorrido(c.timestamp)}</div><div class="tempo-lbl">aguardando</div></div>
+        </div>
+        <button class="btn-atender" onclick="atender(${c.id},'${c.mesa}','${c.tipo}')">✅ Marcar como Atendido</button>`;
+    });
+
+    // Histórico local
+    const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    const hs=document.getElementById('history-section');
+    if(hist.length){
+      hs.style.display='block';
+      document.getElementById('history-list').innerHTML=hist.slice(0,10).map(h=>{
+        const info=getTipoInfo(h.tipo);
+        return `<div class="history-item">
+          <div><div class="mesa">Mesa ${h.mesa} — ${info.emoji} ${info.label}</div>
+          ${h.obs?`<div class="history-obs">"${h.obs.substring(0,60)}"</div>`:''}</div>
+          <span style="white-space:nowrap">✅ ${h.horaAtendido}</span></div>`;
+      }).join('');
+    } else hs.style.display='none';
+
+  } catch(e){
+    setOnline(false);
+    console.error(e);
   }
-  renderizar();
-};
+}
 
-// CARDÁPIO
+// Atualiza timers
+setInterval(()=>{
+  document.querySelectorAll('[id^="tempo-"]').forEach(el=>{
+    const card=el.closest('.chamado-card');
+    if(card){
+      // timestamp está no card via data, mas vamos só atualizar o display
+      // O tempo é recalculado no próximo poll
+    }
+  });
+},1000);
+
+// Polling a cada 3 segundos
+setInterval(renderizar, 3000);
+
+// ========== CONFIG ==========
+function getConfig(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}');}catch{return{};}}
+function salvarConfig(){
+  localStorage.setItem(CONFIG_KEY,JSON.stringify({
+    nome:document.getElementById('cfg-nome').value||'Restaurante',
+    msgQr:document.getElementById('cfg-msg-qr').value||'📱 Escaneie para Chamar o Garçom / Fazer Pedido'
+  }));
+  document.getElementById('topbar-name').textContent='Painel — '+(document.getElementById('cfg-nome').value||'Garçom Digital');
+}
+function carregarConfig(){
+  const cfg=getConfig();
+  if(cfg.nome){document.getElementById('cfg-nome').value=cfg.nome;document.getElementById('topbar-name').textContent='Painel — '+cfg.nome;}
+  if(cfg.msgQr)document.getElementById('cfg-msg-qr').value=cfg.msgQr;
+}
+
+// ========== CARDÁPIO ==========
+function getCardapio(){try{return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]');}catch{return[];}}
+function saveCardapio(arr){localStorage.setItem(CARDAPIO_KEY,JSON.stringify(arr));}
+
 function renderCardapio(){
   const items=getCardapio();
   const tbody=document.getElementById('cardapio-tbody');
@@ -555,19 +544,16 @@ function renderCardapio(){
   const empty=document.getElementById('cardapio-empty-msg');
   if(!items.length){table.style.display='none';empty.style.display='block';return;}
   empty.style.display='none';table.style.display='table';
-  tbody.innerHTML=items.map(item=>`
+  tbody.innerHTML=items.map(i=>`
     <tr>
-      <td><strong>${item.cod}</strong></td>
-      <td>${item.desc}</td>
-      <td>R$ ${parseFloat(item.valor).toFixed(2)}</td>
-      <td><div class="item-actions"><button class="btn-sm red" onclick="removerItem('${item.id}')">✕ Remover</button></div></td>
+      <td><strong>${i.cod}</strong></td>
+      <td>${i.desc}</td>
+      <td>R$ ${parseFloat(i.valor).toFixed(2)}</td>
+      <td><button class="btn-sm red" onclick="removerItem('${i.id}')">✕</button></td>
     </tr>`).join('');
-  // Arquivo
-  const arquivo=localStorage.getItem(CARDAPIO_FILE_KEY);
-  const preview=document.getElementById('file-preview');
-  const fname=document.getElementById('file-name');
-  if(arquivo){preview.style.display='flex';fname.textContent='Arquivo carregado ✅';}
-  else{preview.style.display='none';}
+  const arq=localStorage.getItem(CARDAPIO_FILE_KEY);
+  document.getElementById('file-preview').style.display=arq?'flex':'none';
+  if(arq)document.getElementById('file-name').textContent='Arquivo carregado ✅';
 }
 
 function adicionarItem(){
@@ -590,11 +576,21 @@ function removerItem(id){
   renderCardapio();
 }
 
+function limparCardapio(){
+  if(!confirm('Limpar todo o cardápio?'))return;
+  saveCardapio([]);renderCardapio();mostrarAlerta('Cardápio limpo!');
+}
+
+function limparHistoricoLocal(){
+  if(!confirm('Limpar histórico?'))return;
+  localStorage.removeItem(HISTORY_KEY);renderizar();
+}
+
 // UPLOAD
 function processarUpload(e){
   const file=e.target.files[0];
   if(!file)return;
-  if(file.size>5*1024*1024){mostrarAlerta('⚠️ Arquivo muito grande! Máximo 5MB.');return;}
+  if(file.size>5*1024*1024){mostrarAlerta('⚠️ Arquivo muito grande! Máx. 5MB.');return;}
   const reader=new FileReader();
   reader.onload=ev=>{
     localStorage.setItem(CARDAPIO_FILE_KEY,ev.target.result);
@@ -608,33 +604,17 @@ function removerArquivo(){
   localStorage.removeItem(CARDAPIO_FILE_KEY);
   document.getElementById('file-preview').style.display='none';
   document.getElementById('file-upload').value='';
-  mostrarAlerta('Arquivo removido.');
 }
 
-// ADDR BAR
-function atualizarPreview(){
-  const val=document.getElementById('cfg-base-url').value.trim();
-  const mesa=document.getElementById('cfg-mesa')?.value||'1';
-  const nome=getConfig().nome||'Restaurante';
-  const prev=document.getElementById('addr-preview');
-  if(val){
-    const url=`${val.replace(/\/$/,'')}/mesa.html?mesa=${mesa}&nome=${encodeURIComponent(nome)}`;
-    prev.innerHTML=`Prévia: ${url}`;
-  }else prev.innerHTML='';
-}
-function aplicarEndereco(){
-  baseUrlCustom=document.getElementById('cfg-base-url').value.trim().replace(/\/$/,'');
-  atualizarPreview();
-  mostrarAlerta(baseUrlCustom?'✅ Endereço aplicado!':'⚠️ Endereço removido.');
-}
-function toggleInfo(){document.getElementById('info-local').classList.toggle('show');}
-
-// QR CODE
-function buildUrl(mesaNum){
-  const nome=getConfig().nome||'Restaurante';
-  if(baseUrlCustom) return `${baseUrlCustom}/mesa.html?mesa=${mesaNum}&nome=${encodeURIComponent(nome)}`;
+// ========== QR CODE ==========
+function getBaseUrl(){
   const base=window.location.href.replace(/painel\.html.*$/,'');
-  return `${base}mesa.html?mesa=${mesaNum}&nome=${encodeURIComponent(nome)}`;
+  return base;
+}
+function buildUrl(mesaNum){
+  const cfg=getConfig();
+  const nome=cfg.nome||'Restaurante';
+  return `${getBaseUrl()}mesa.html?mesa=${mesaNum}&nome=${encodeURIComponent(nome)}`;
 }
 
 function gerarQR(){
@@ -642,14 +622,11 @@ function gerarQR(){
   const cfg=getConfig();
   const url=buildUrl(mesaNum);
   qrLinkAtual=url;
-
   document.getElementById('qr-mesa-num').textContent=mesaNum;
   document.getElementById('qr-mesa-num2').textContent=mesaNum;
   document.getElementById('qr-etiqueta-msg').textContent=cfg.msgQr||'📱 Escaneie para Chamar o Garçom / Fazer Pedido';
   document.getElementById('qr-nome-rest').textContent=cfg.nome||'Restaurante';
-  document.getElementById('qr-aviso').style.display=url.startsWith('file://')?'block':'none';
   document.getElementById('qr-link-box').textContent=url;
-
   const cont=document.getElementById('qr-container');
   cont.innerHTML='';
   new QRCode(cont,{text:url,width:200,height:200,colorDark:'#1A1A2E',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.H});
@@ -662,21 +639,18 @@ function gerarMultiplosQR(){
   if(ate<de||ate-de>49){mostrarAlerta('⚠️ Máximo 50 mesas por vez.');return;}
   const cfg=getConfig();
   const grid=document.getElementById('multi-qr-grid');
-  const area=document.getElementById('multi-qr-area');
   grid.innerHTML='';
-  area.style.display='block';
+  document.getElementById('multi-qr-area').style.display='block';
   for(let m=de;m<=ate;m++){
     const url=buildUrl(m);
     const div=document.createElement('div');
     div.style.cssText='background:white;border-radius:14px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.08);';
-    div.innerHTML=`<div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:4px;">${cfg.msgQr||'📱 Escaneie para Chamar o Garçom'}</div>
+    div.innerHTML=`<div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;">${cfg.msgQr||'📱 Escaneie aqui'}</div>
       <div id="mqr-${m}"></div>
       <div style="font-size:20px;font-weight:900;color:#1A1A2E;margin-top:8px;">Mesa ${m}</div>
       <div style="font-size:11px;color:#9CA3AF;font-weight:600;">${cfg.nome||'Restaurante'}</div>`;
     grid.appendChild(div);
-    setTimeout(()=>{
-      new QRCode(document.getElementById('mqr-'+m),{text:url,width:150,height:150,colorDark:'#1A1A2E',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M});
-    },50*( m-de));
+    setTimeout(()=>{new QRCode(document.getElementById('mqr-'+m),{text:url,width:150,height:150,colorDark:'#1A1A2E',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M});},50*(m-de));
   }
   mostrarAlerta(`✅ ${ate-de+1} QR Codes gerados!`);
 }
@@ -684,20 +658,18 @@ function gerarMultiplosQR(){
 function fecharModal(){document.getElementById('modal').classList.remove('show');}
 function copiarLink(){navigator.clipboard.writeText(qrLinkAtual).then(()=>{mostrarAlerta('✅ Link copiado!');fecharModal();});}
 
-// PAGES
-function showPage(id){
+// ========== PAGES ==========
+function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  event.target.classList.add('active');
+  if(btn)btn.classList.add('active');
   if(id==='cardapio')renderCardapio();
 }
 
-// INIT
+// ========== INIT ==========
 carregarConfig();
 renderizar();
-renderCardapio();
-if(window.location.protocol==='file:')document.getElementById('info-local').classList.add('show');
 </script>
 </body>
 </html>

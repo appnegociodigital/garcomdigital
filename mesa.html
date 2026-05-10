@@ -26,6 +26,14 @@
 
   .main{width:100%;max-width:440px;padding:20px 16px 60px;flex:1;}
 
+  /* STATUS CONEXÃO */
+  .conn-status{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:10px;padding:8px 14px;margin-bottom:16px;font-size:13px;font-weight:700;box-shadow:0 1px 8px rgba(0,0,0,0.06);}
+  .conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .conn-dot.online{background:var(--green);animation:blink 2s infinite;}
+  .conn-dot.offline{background:var(--red);}
+  .conn-dot.connecting{background:var(--yellow,#F59E0B);animation:blink 0.8s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
   .active-call{display:none;background:var(--orange-light);border:2px solid var(--orange);border-radius:14px;padding:14px 18px;margin-bottom:18px;text-align:center;}
   .active-call.show{display:block;}
   .active-call-title{font-size:13px;font-weight:700;color:var(--orange-dark);margin-bottom:2px;}
@@ -39,6 +47,7 @@
   .btn-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
   .btn-call{width:100%;padding:18px 20px;border:none;border-radius:18px;cursor:pointer;display:flex;align-items:center;gap:16px;font-family:'Nunito',sans-serif;transition:transform 0.12s;}
   .btn-call:active{transform:scale(0.97);}
+  .btn-call:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
   .btn-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:rgba(255,255,255,0.25);}
   .btn-text{text-align:left;}
   .btn-title{font-size:17px;font-weight:900;display:block;margin-bottom:1px;}
@@ -52,7 +61,6 @@
   .btn-cancel .btn-title{color:var(--red-dark);}
   .btn-cancel .btn-sub{color:var(--red);}
 
-  /* SEÇÃO EXPANDÍVEL */
   .expand-section{background:var(--white);border-radius:18px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);margin-bottom:14px;}
   .expand-header{width:100%;padding:18px 20px;border:none;cursor:pointer;display:flex;align-items:center;gap:16px;font-family:'Nunito',sans-serif;transition:filter 0.2s;}
   .expand-header:active{filter:brightness(0.9);}
@@ -67,7 +75,6 @@
   .tabs{display:flex;gap:8px;margin-bottom:16px;}
   .tab{flex:1;padding:9px 6px;border:2px solid var(--blue-light);border-radius:10px;background:var(--blue-light);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--blue);cursor:pointer;text-align:center;transition:all 0.2s;}
   .tab.active{background:var(--blue);color:white;border-color:var(--blue);}
-
   .tab-content{display:none;}
   .tab-content.active{display:block;}
 
@@ -79,10 +86,8 @@
   .cardapio-empty{text-align:center;padding:24px 16px;color:var(--gray);}
   .cardapio-empty-icon{font-size:36px;margin-bottom:8px;}
   .cardapio-empty-text{font-size:13px;font-weight:600;}
-
   .cardapio-search{width:100%;border:2px solid #E5E7EB;border-radius:10px;padding:9px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:var(--text);outline:none;margin-bottom:10px;transition:border 0.2s;}
   .cardapio-search:focus{border-color:var(--blue);}
-
   .cardapio-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
   .cardapio-item{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:10px 12px;border:2px solid transparent;transition:all 0.15s;}
   .cardapio-item.selected{border-color:var(--blue);background:var(--blue-light);}
@@ -92,7 +97,6 @@
   .item-qty{display:flex;align-items:center;gap:5px;flex-shrink:0;}
   .qty-btn{width:28px;height:28px;border:none;border-radius:8px;background:var(--blue);color:white;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;}
   .qty-num{font-size:15px;font-weight:900;color:var(--text);min-width:18px;text-align:center;}
-
   .carrinho{background:var(--blue-light);border:2px solid var(--blue);border-radius:12px;padding:12px 14px;margin-top:12px;display:none;}
   .carrinho.show{display:block;}
   .carrinho-title{font-size:13px;font-weight:900;color:var(--blue-dark);margin-bottom:8px;}
@@ -101,7 +105,7 @@
 
   .btn-enviar{width:100%;padding:14px;border:none;border-radius:12px;color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;margin-top:12px;transition:filter 0.2s;}
   .btn-enviar.blue{background:var(--blue);}
-  .btn-enviar.blue:hover{filter:brightness(0.9);}
+  .btn-enviar:hover{filter:brightness(0.9);}
   .btn-enviar:disabled{opacity:0.5;cursor:not-allowed;}
 
   .dl-option{display:flex;align-items:center;gap:12px;background:var(--purple-light);border:2px solid #DDD6FE;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;}
@@ -114,8 +118,8 @@
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1A1A2E;color:white;padding:13px 22px;border-radius:14px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(0,0,0,0.3);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:999;text-align:center;max-width:300px;pointer-events:none;}
   .toast.show{transform:translateX(-50%) translateY(0);}
   .toast.success{background:var(--green-dark);}
+  .toast.error{background:var(--red-dark);}
   .toast.cancel{background:#555;}
-
   .footer{text-align:center;padding:12px 0 6px;font-size:11px;color:#ccc;font-weight:600;}
 </style>
 </head>
@@ -130,6 +134,11 @@
 </div>
 
 <div class="main">
+
+  <div class="conn-status" id="conn-status">
+    <span class="conn-dot connecting" id="conn-dot"></span>
+    <span id="conn-text">Conectando...</span>
+  </div>
 
   <div class="active-call" id="active-call">
     <div class="active-call-title"><span class="pulse"></span>Chamado enviado!</div>
@@ -171,20 +180,16 @@
         <button class="tab active" onclick="switchTab('livre')" id="tab-livre">✏️ Solicitação Livre</button>
         <button class="tab" onclick="switchTab('cardapio')" id="tab-cardapio">📋 Cardápio</button>
       </div>
-
-      <!-- LIVRE -->
       <div class="tab-content active" id="content-livre">
         <span class="obs-label">Descreva seu pedido:</span>
         <textarea class="obs-textarea" id="obs-livre" placeholder="Ex: 1 cerveja bem gelada&#10;1 suco de laranja natural&#10;Mais guardanapos, por favor..."></textarea>
         <div class="obs-hint">Seja específico para facilitar o atendimento 😊</div>
         <button class="btn-enviar blue" onclick="enviarPedidoLivre()">🛎️ Enviar Pedido</button>
       </div>
-
-      <!-- CARDÁPIO -->
       <div class="tab-content" id="content-cardapio">
         <div id="cardapio-vazio" class="cardapio-empty">
           <div class="cardapio-empty-icon">📋</div>
-          <div class="cardapio-empty-text">O cardápio ainda não foi configurado.<br>Use "Solicitação Livre" ou consulte o garçom.</div>
+          <div class="cardapio-empty-text">Cardápio não configurado.<br>Use "Solicitação Livre" ou consulte o garçom.</div>
         </div>
         <div id="cardapio-com-itens" style="display:none">
           <input class="cardapio-search" type="text" placeholder="🔍 Buscar por nome ou código..." oninput="filtrarCardapio(this.value)">
@@ -215,7 +220,6 @@
     </div>
   </div>
 
-  <!-- CANCELAR -->
   <div class="btn-grid">
     <button class="btn-call btn-cancel" onclick="cancelarChamado()">
       <div class="btn-icon">❌</div>
@@ -232,6 +236,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ========== CONFIGURAÇÃO SUPABASE ==========
+const SUPABASE_URL = 'https://mgqwhjjqkhrivgogwtdf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ncXdoampxa2hyaXZnb2d3dGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MDg2MDMsImV4cCI6MjA5Mzk4NDYwM30.OOt4zd1fTeogLm848KNW7a09pxDL1BMsJWYWrGI6s5I';
+const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+
+// ========== PARAMS ==========
 const params = new URLSearchParams(window.location.search);
 const mesa = params.get('mesa') || '1';
 const nomeRestaurante = params.get('nome') || 'Restaurante';
@@ -239,82 +249,151 @@ document.getElementById('mesa-display').textContent = mesa;
 document.getElementById('restaurant-name').textContent = nomeRestaurante;
 document.title = `Mesa ${mesa} — ${nomeRestaurante}`;
 
-const STORAGE_KEY = 'restaurante_chamados';
 const CARDAPIO_KEY = 'restaurante_cardapio';
 const CARDAPIO_FILE_KEY = 'restaurante_cardapio_arquivo';
-let chamadoAtivo = null;
+let chamadoAtivoId = null;
 let carrinho = {};
+let online = false;
 
-const labels = { garcom:'🔔 Chamar Garçom', conta:'💳 Pedir a Conta', pedido:'🍽️ Pedido' };
-
-function getChamados(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
-function saveChamados(arr){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));
-  const bc=new BroadcastChannel('restaurante_updates');
-  bc.postMessage({type:'update'});bc.close();
+// ========== CONEXÃO ==========
+function setConexao(status) {
+  const dot = document.getElementById('conn-dot');
+  const txt = document.getElementById('conn-text');
+  dot.className = 'conn-dot ' + status;
+  if(status==='online'){txt.textContent='Conectado ✅';online=true;}
+  else if(status==='offline'){txt.textContent='Sem conexão — tente novamente';online=false;}
+  else{txt.textContent='Conectando...';online=false;}
 }
-function getCardapio(){try{return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]');}catch{return[];}}
 
-function enviarChamado(tipo,obs){
-  const lista=getChamados();
-  const filtrado=lista.filter(c=>c.mesa!==mesa);
-  const novo={id:Date.now(),mesa,tipo,label:labels[tipo],obs:obs||'',
-    hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
-    timestamp:Date.now(),status:'pendente'};
-  filtrado.push(novo);
-  saveChamados(filtrado);
-  chamadoAtivo=tipo;
-  document.getElementById('active-call-type').textContent=labels[tipo];
-  const obsEl=document.getElementById('active-call-obs');
-  obsEl.textContent=obs?`"${obs.substring(0,80)}${obs.length>80?'...':''}"` :'';
+// ========== API SUPABASE ==========
+async function apiGet(path) {
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {headers:HEADERS});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function apiPost(path, body) {
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {method:'POST',headers:{...HEADERS,'Prefer':'return=representation'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function apiDelete(path) {
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {method:'DELETE',headers:HEADERS});
+  if(!r.ok) throw new Error(await r.text());
+}
+
+// ========== CHAMADOS ==========
+const labels = {garcom:'🔔 Chamar Garçom', conta:'💳 Pedir a Conta', pedido:'🍽️ Pedido'};
+
+async function enviarChamado(tipo, obs) {
+  if(!online){mostrarToast('⚠️ Sem conexão. Verifique sua internet.','error');return;}
+  try {
+    // Remove chamado anterior desta mesa
+    if(chamadoAtivoId) {
+      await apiDelete(`chamados?id=eq.${chamadoAtivoId}`);
+    }
+    const novo = {
+      mesa, tipo, label:labels[tipo], obs:obs||'',
+      hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+      timestamp:Date.now(), status:'pendente'
+    };
+    const res = await apiPost('chamados', novo);
+    chamadoAtivoId = res[0]?.id;
+    mostrarChamadoAtivo(labels[tipo], obs);
+    mostrarToast('✅ Chamado enviado! O garçom está a caminho.','success');
+  } catch(e) {
+    mostrarToast('❌ Erro ao enviar. Tente novamente.','error');
+    console.error(e);
+  }
+}
+
+async function cancelarChamado() {
+  try {
+    if(chamadoAtivoId) {
+      await apiDelete(`chamados?id=eq.${chamadoAtivoId}`);
+      chamadoAtivoId = null;
+    } else {
+      await apiDelete(`chamados?mesa=eq.${mesa}&status=eq.pendente`);
+    }
+    document.getElementById('active-call').classList.remove('show');
+    mostrarToast('Chamado cancelado.','cancel');
+  } catch(e) {
+    mostrarToast('❌ Erro ao cancelar.','error');
+  }
+}
+
+function mostrarChamadoAtivo(label, obs) {
+  document.getElementById('active-call-type').textContent = label;
+  const obsEl = document.getElementById('active-call-obs');
+  obsEl.textContent = obs ? `"${obs.substring(0,80)}${obs.length>80?'...':''}"` : '';
   document.getElementById('active-call').classList.add('show');
-  mostrarToast('✅ Chamado enviado! O garçom está a caminho.','success');
 }
 
-function enviarPedidoLivre(){
-  const obs=document.getElementById('obs-livre').value.trim();
+// Verifica chamado ativo ao carregar
+async function verificarChamadoAtivo() {
+  try {
+    const lista = await apiGet(`chamados?mesa=eq.${mesa}&status=eq.pendente&order=created_at.desc&limit=1`);
+    if(lista.length) {
+      chamadoAtivoId = lista[0].id;
+      mostrarChamadoAtivo(lista[0].label, lista[0].obs);
+    }
+    setConexao('online');
+  } catch(e) {
+    setConexao('offline');
+  }
+}
+
+// Polling para detectar quando chamado for atendido
+async function verificarAtendimento() {
+  if(!chamadoAtivoId) return;
+  try {
+    const lista = await apiGet(`chamados?id=eq.${chamadoAtivoId}`);
+    if(!lista.length) {
+      chamadoAtivoId = null;
+      document.getElementById('active-call').classList.remove('show');
+      mostrarToast('✅ Chamado atendido! O garçom está a caminho.','success');
+    }
+    setConexao('online');
+  } catch(e) { setConexao('offline'); }
+}
+
+setInterval(verificarAtendimento, 4000);
+
+// ========== PEDIDOS ==========
+function enviarPedidoLivre() {
+  const obs = document.getElementById('obs-livre').value.trim();
   if(!obs){mostrarToast('⚠️ Descreva seu pedido antes de enviar!');return;}
-  enviarChamado('pedido',obs);
+  enviarChamado('pedido', obs);
   document.getElementById('obs-livre').value='';
   fecharSection('pedido');
 }
 
-function enviarPedidoCardapio(){
-  const itens=Object.values(carrinho).filter(c=>c.qty>0);
-  if(!itens.length)return;
-  const obs=itens.map(c=>`${c.qty}x ${c.item.cod} ${c.item.desc}`).join(' | ');
-  enviarChamado('pedido',obs);
-  carrinho={};
+function enviarPedidoCardapio() {
+  const itens = Object.values(carrinho).filter(c=>c.qty>0);
+  if(!itens.length) return;
+  const obs = itens.map(c=>`${c.qty}x ${c.item.cod} ${c.item.desc}`).join(' | ');
+  enviarChamado('pedido', obs);
+  carrinho = {};
   renderCarrinho();
   fecharSection('pedido');
 }
 
-function cancelarChamado(){
-  saveChamados(getChamados().filter(c=>c.mesa!==mesa));
-  chamadoAtivo=null;
-  document.getElementById('active-call').classList.remove('show');
-  mostrarToast('Chamado cancelado.','cancel');
-}
-
-// TOGGLE SECTIONS
-function toggleSection(id){
-  const body=document.getElementById('body-'+id);
-  const chev=document.getElementById('chev-'+id);
-  const isOpen=body.classList.contains('open');
+// ========== SECTIONS ==========
+function toggleSection(id) {
+  const body = document.getElementById('body-'+id);
+  const chev = document.getElementById('chev-'+id);
   body.classList.toggle('open');
   chev.classList.toggle('open');
-  if(!isOpen){
+  if(body.classList.contains('open')) {
     if(id==='pedido') renderCardapioTab();
     if(id==='cardapio-dl') renderCardapioDownload();
   }
 }
-function fecharSection(id){
+function fecharSection(id) {
   document.getElementById('body-'+id).classList.remove('open');
   document.getElementById('chev-'+id).classList.remove('open');
 }
 
-// TABS
-function switchTab(tab){
+function switchTab(tab) {
   ['livre','cardapio'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('content-'+t).classList.toggle('active',t===tab);
@@ -322,19 +401,19 @@ function switchTab(tab){
   if(tab==='cardapio') renderCardapioTab();
 }
 
-// CARDÁPIO TAB
-function renderCardapioTab(){
-  const items=getCardapio();
-  const vazio=document.getElementById('cardapio-vazio');
-  const comItens=document.getElementById('cardapio-com-itens');
-  if(!items.length){vazio.style.display='block';comItens.style.display='none';return;}
-  vazio.style.display='none';comItens.style.display='block';
-  renderListaCardapio(items);
+// ========== CARDÁPIO ==========
+function getCardapio(){try{return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]');}catch{return[];}}
+
+function renderCardapioTab() {
+  const items = getCardapio();
+  document.getElementById('cardapio-vazio').style.display = items.length?'none':'block';
+  document.getElementById('cardapio-com-itens').style.display = items.length?'block':'none';
+  if(items.length) renderListaCardapio(items);
 }
 
-function renderListaCardapio(items){
-  document.getElementById('cardapio-list').innerHTML=items.map(item=>{
-    const qty=carrinho[item.id]?.qty||0;
+function renderListaCardapio(items) {
+  document.getElementById('cardapio-list').innerHTML = items.map(item=>{
+    const qty = carrinho[item.id]?.qty||0;
     return `<div class="cardapio-item ${qty>0?'selected':''}" id="ci-${item.id}">
       <span class="item-cod">${item.cod}</span>
       <span class="item-desc">${item.desc}</span>
@@ -348,125 +427,94 @@ function renderListaCardapio(items){
   }).join('');
 }
 
-function filtrarCardapio(q){
-  const items=getCardapio().filter(i=>
+function filtrarCardapio(q) {
+  const items = getCardapio().filter(i=>
     i.cod.toLowerCase().includes(q.toLowerCase())||
     i.desc.toLowerCase().includes(q.toLowerCase()));
   renderListaCardapio(items);
 }
 
-function changeQty(id,delta){
-  const items=getCardapio();
-  const item=items.find(i=>i.id===id);
-  if(!item)return;
-  if(!carrinho[id])carrinho[id]={item,qty:0};
-  carrinho[id].qty=Math.max(0,carrinho[id].qty+delta);
-  if(carrinho[id].qty===0)delete carrinho[id];
+function changeQty(id, delta) {
+  const items = getCardapio();
+  const item = items.find(i=>i.id===id);
+  if(!item) return;
+  if(!carrinho[id]) carrinho[id]={item,qty:0};
+  carrinho[id].qty = Math.max(0, carrinho[id].qty+delta);
+  if(carrinho[id].qty===0) delete carrinho[id];
   const qEl=document.getElementById('qty-'+id);
   const cEl=document.getElementById('ci-'+id);
-  if(qEl)qEl.textContent=carrinho[id]?.qty||0;
-  if(cEl)cEl.classList.toggle('selected',(carrinho[id]?.qty||0)>0);
+  if(qEl) qEl.textContent=carrinho[id]?.qty||0;
+  if(cEl) cEl.classList.toggle('selected',(carrinho[id]?.qty||0)>0);
   renderCarrinho();
 }
 
-function renderCarrinho(){
-  const itens=Object.values(carrinho).filter(c=>c.qty>0);
-  const c=document.getElementById('carrinho');
-  const btn=document.getElementById('btn-enviar-cardapio');
+function renderCarrinho() {
+  const itens = Object.values(carrinho).filter(c=>c.qty>0);
+  const c = document.getElementById('carrinho');
+  const btn = document.getElementById('btn-enviar-cardapio');
   if(!itens.length){c.classList.remove('show');btn.disabled=true;return;}
   c.classList.add('show');btn.disabled=false;
   let total=0;
-  document.getElementById('carrinho-itens').innerHTML=itens.map(c=>{
+  document.getElementById('carrinho-itens').innerHTML = itens.map(c=>{
     const sub=c.qty*parseFloat(c.item.valor);total+=sub;
     return `<div class="carrinho-item"><span>${c.qty}x ${c.item.desc}</span><span>R$${sub.toFixed(2)}</span></div>`;
   }).join('');
   document.getElementById('carrinho-total').textContent=`Total estimado: R$${total.toFixed(2)}`;
 }
 
-// CARDÁPIO DOWNLOAD
-function renderCardapioDownload(){
-  const cont=document.getElementById('dl-content');
-  const arquivo=localStorage.getItem(CARDAPIO_FILE_KEY);
-  const items=getCardapio();
-  let html='';
-  if(arquivo){
+// ========== DOWNLOAD CARDÁPIO ==========
+function renderCardapioDownload() {
+  const cont = document.getElementById('dl-content');
+  const arquivo = localStorage.getItem(CARDAPIO_FILE_KEY);
+  const items = getCardapio();
+  let html = '';
+  if(arquivo) {
     const ext=arquivo.split(';')[0].split('/')[1];
-    const isPdf=ext==='pdf';
     html+=`<div class="dl-option" onclick="baixarArquivo()">
-      <span class="dl-option-icon">${isPdf?'📄':'🖼️'}</span>
-      <div><span class="dl-option-title">${isPdf?'Baixar Cardápio PDF':'Ver Imagem do Cardápio'}</span>
+      <span class="dl-option-icon">${ext==='pdf'?'📄':'🖼️'}</span>
+      <div><span class="dl-option-title">${ext==='pdf'?'Baixar Cardápio PDF':'Ver Imagem do Cardápio'}</span>
       <span class="dl-option-sub">Toque para abrir o arquivo</span></div></div>`;
   }
-  if(items.length){
+  if(items.length) {
     html+=`<div class="dl-option" onclick="verCardapioOnline()">
       <span class="dl-option-icon">📋</span>
       <div><span class="dl-option-title">Ver Cardápio Online</span>
       <span class="dl-option-sub">${items.length} item(s) no cardápio digital</span></div></div>`;
   }
-  if(!arquivo&&!items.length){
-    html='<div class="no-cardapio">📭 Cardápio ainda não disponível.<br>Consulte o garçom.</div>';
-  }
+  if(!arquivo&&!items.length) html='<div class="no-cardapio">📭 Cardápio ainda não disponível.<br>Consulte o garçom.</div>';
   cont.innerHTML=html;
 }
 
-function baixarArquivo(){
-  const arquivo=localStorage.getItem(CARDAPIO_FILE_KEY);
-  if(!arquivo)return;
-  const link=document.createElement('a');
-  link.href=arquivo;link.download='cardapio';link.click();
+function baixarArquivo() {
+  const a=localStorage.getItem(CARDAPIO_FILE_KEY);
+  if(!a)return;
+  const link=document.createElement('a');link.href=a;link.download='cardapio';link.click();
 }
 
-function verCardapioOnline(){
-  const items=getCardapio();
-  if(!items.length)return;
+function verCardapioOnline() {
+  const items=getCardapio();if(!items.length)return;
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Cardápio — ${nomeRestaurante}</title>
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cardápio</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
   <style>body{font-family:'Nunito',sans-serif;background:#F9F6F2;padding:20px;max-width:500px;margin:0 auto;}
-  h1{font-size:24px;font-weight:900;color:#1A1A2E;margin-bottom:4px;}
-  .sub{font-size:14px;color:#6B7280;font-weight:600;margin-bottom:20px;}
+  h1{font-size:24px;font-weight:900;color:#1A1A2E;margin-bottom:4px;}.sub{font-size:14px;color:#6B7280;font-weight:600;margin-bottom:20px;}
   .item{background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
   .cod{background:#EFF6FF;color:#2563EB;font-size:12px;font-weight:900;padding:4px 8px;border-radius:6px;flex-shrink:0;}
-  .desc{flex:1;font-size:15px;font-weight:700;color:#1A1A2E;}
-  .val{font-size:16px;font-weight:900;color:#1FA870;flex-shrink:0;}
-  </style></head><body>
-  <h1>🍽️ ${nomeRestaurante}</h1><div class="sub">Cardápio Digital — Mesa ${mesa}</div>
+  .desc{flex:1;font-size:15px;font-weight:700;color:#1A1A2E;}.val{font-size:16px;font-weight:900;color:#1FA870;flex-shrink:0;}
+  </style></head><body><h1>🍽️ ${nomeRestaurante}</h1><div class="sub">Cardápio Digital — Mesa ${mesa}</div>
   ${items.map(i=>`<div class="item"><span class="cod">${i.cod}</span><span class="desc">${i.desc}</span><span class="val">R$${parseFloat(i.valor).toFixed(2)}</span></div>`).join('')}
   </body></html>`);
   w.document.close();
 }
 
+// ========== TOAST ==========
 function mostrarToast(msg,tipo=''){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast show '+tipo;
-  setTimeout(()=>{t.className='toast '+tipo;},3000);
+  setTimeout(()=>{t.className='toast '+tipo;},3500);
 }
 
-// Init
-function verificarChamadoAtivo(){
-  const lista=getChamados();
-  const meu=lista.find(c=>c.mesa===mesa&&c.status==='pendente');
-  if(meu){
-    chamadoAtivo=meu.tipo;
-    document.getElementById('active-call-type').textContent=meu.label;
-    const obsEl=document.getElementById('active-call-obs');
-    obsEl.textContent=meu.obs?`"${meu.obs.substring(0,80)}"` :'';
-    document.getElementById('active-call').classList.add('show');
-  }
-}
-
-const bc=new BroadcastChannel('restaurante_updates');
-bc.onmessage=()=>{
-  const lista=getChamados();
-  if(!lista.find(c=>c.mesa===mesa)&&chamadoAtivo){
-    chamadoAtivo=null;
-    document.getElementById('active-call').classList.remove('show');
-    mostrarToast('✅ Chamado atendido!','success');
-  }
-};
-
+// ========== INIT ==========
 verificarChamadoAtivo();
 </script>
 </body>

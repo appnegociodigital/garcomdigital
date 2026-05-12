@@ -1377,15 +1377,19 @@ function removerArquivo(){ localStorage.removeItem(CARDAPIO_FILE_KEY); localStor
 // QR CODE
 // ====================================================
 function getBaseUrl(){ return window.location.href.replace(/[?#].*$/,''); }
-function buildUrl(mesaNum){ const cfg=getConfig(); return `${getBaseUrl()}?mesa=${mesaNum}&nome=${encodeURIComponent(cfg.nome||'Restaurante')}`; }
+function buildUrl(num, token){ const cfg=getConfig(); let url=`${getBaseUrl()}?mesa=${num}&nome=${encodeURIComponent(cfg.nome||'Restaurante')}`; if(token) url+=`&token=${token}`; return url; }
 
 function gerarQR(){
-  const mesaNum=document.getElementById('cfg-mesa').value||'1'; const cfg=getConfig(); const url=buildUrl(mesaNum); qrLinkAtual=url;
-  document.getElementById('qr-mesa-num').textContent=mesaNum; document.getElementById('qr-mesa-num2').textContent=mesaNum;
+  const num=document.getElementById('cfg-mesa').value||'1'; const cfg=getConfig();
+  const sessao=sessoesCache[String(num)]; const token=sessao&&sessao.status==='ativa'?sessao.token:null;
+  const url=buildUrl(num,token); qrLinkAtual=url;
+  document.getElementById('qr-mesa-num').textContent=num; document.getElementById('qr-mesa-num2').textContent=num;
   document.getElementById('qr-etiqueta-msg').textContent=cfg.msgQr||'📱 Escaneie para Chamar o Garçom / Fazer Pedido';
-  document.getElementById('qr-nome-rest').textContent=cfg.nome||'Restaurante'; document.getElementById('qr-link-box').textContent=url;
+  document.getElementById('qr-nome-rest').textContent=cfg.nome||'Restaurante';
+  document.getElementById('qr-link-box').textContent=url;
   const cont=document.getElementById('qr-container'); cont.innerHTML='';
   new QRCode(cont,{text:url,width:200,height:200,colorDark:'#1A1A2E',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.H});
+  if(!token){ const warn=document.createElement('div'); warn.style.cssText='color:#EF4444;font-size:11px;font-weight:700;margin-top:8px;'; warn.textContent='⚠️ Mesa sem sessão ativa — abra a mesa primeiro para gerar QR com token.'; document.getElementById('qr-link-box').appendChild(warn); }
   document.getElementById('modal').classList.add('show');
 }
 
@@ -1393,7 +1397,13 @@ function gerarMultiplosQR(){
   const de=parseInt(document.getElementById('mesa-de').value)||1; const ate=parseInt(document.getElementById('mesa-ate').value)||10;
   if(ate<de||ate-de>49){ mostrarAlerta('⚠️ Máximo 50 mesas por vez.'); return; }
   const cfg=getConfig(); const grid=document.getElementById('multi-qr-grid'); grid.innerHTML=''; document.getElementById('multi-qr-area').style.display='block';
-  for(let m=de;m<=ate;m++){ const url=buildUrl(m); const div=document.createElement('div'); div.style.cssText='background:white;border-radius:14px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.08);'; div.innerHTML=`<div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;">${cfg.msgQr||'📱 Escaneie aqui'}</div><div id="mqr-${m}"></div><div style="font-size:20px;font-weight:900;color:#1A1A2E;margin-top:8px;">Mesa ${m}</div><div style="font-size:11px;color:#9CA3AF;font-weight:600;">${cfg.nome||'Restaurante'}</div>`; grid.appendChild(div); setTimeout(()=>{ new QRCode(document.getElementById('mqr-'+m),{text:url,width:150,height:150,colorDark:'#1A1A2E',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M}); },50*(m-de)); }
+  for(let m=de;m<=ate;m++){
+    const sessao=sessoesCache[String(m)]; const token=sessao&&sessao.status==='ativa'?sessao.token:null;
+    const url=buildUrl(m,token); const div=document.createElement('div');
+    div.style.cssText='background:white;border-radius:14px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.08);';
+    div.innerHTML=`<div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;">${cfg.msgQr||'📱 Escaneie aqui'}</div><div id="mqr-${m}"></div><div style="font-size:20px;font-weight:900;color:#1A1A2E;margin-top:8px;">Mesa ${m}</div><div style="font-size:11px;color:#9CA3AF;font-weight:600;">${cfg.nome||'Restaurante'}</div>${!token?'<div style="font-size:10px;color:#EF4444;font-weight:700;margin-top:4px;">⚠️ Sem sessão ativa</div>':''}`;
+    grid.appendChild(div); setTimeout(()=>{ new QRCode(document.getElementById('mqr-'+m),{text:url,width:150,height:150,colorDark:'#1A1A2E',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M}); },50*(m-de));
+  }
   mostrarAlerta(`✅ ${ate-de+1} QR Codes gerados!`);
 }
 
@@ -1530,18 +1540,16 @@ async function mesaVerificarSessao(){
   }catch(e){}
 }
 
-function inicializarMesa(){
+async function inicializarMesa(){
   mesaNum = urlParams.get('mesa')||'1';
   const nomeRest = urlParams.get('nome')||'Restaurante';
+  const tokenUrl = urlParams.get('token')||null;
   document.getElementById('mesa-display').textContent = mesaNum;
   document.getElementById('restaurant-name').textContent = nomeRest;
   document.title = 'Mesa '+mesaNum+' — '+nomeRest;
 
   // Verifica horário
   verificarAbertura();
-
-  // Exibe tela de autenticação de sessão
-  mostrarAuthOverlay();
 
   mesaTodosItens = getCardapio();
   mesaRenderItensPedido(mesaTodosItens);
@@ -1550,6 +1558,27 @@ function inicializarMesa(){
   setInterval(mesaVerificarStatus, 4000);
   setInterval(verificarAbertura, 60000);
   setInterval(mesaVerificarSessao, 8000);
+
+  // Se tem token na URL, tenta autenticar automaticamente
+  if(tokenUrl){
+    mesaSetConexao('connecting');
+    try{
+      const sessoes = await mesaApiGet(`sessoes_mesa?mesa=eq.${mesaNum}&status=eq.ativa&select=id,token`);
+      if(sessoes.length && sessoes[0].token === tokenUrl){
+        mesaSessionToken = tokenUrl;
+        mesaSessionId = sessoes[0].id;
+        mesaSetConexao('online');
+        mesaInit();
+        mostrarToast('✅ Mesa '+mesaNum+' — bem-vindo!','success');
+        return; // não exibe overlay de token
+      }
+    }catch(e){}
+    // Token inválido ou sessão encerrada — exibe aviso e overlay
+    mostrarToast('🔒 QR Code inválido ou sessão encerrada. Peça ao garçom.','error');
+  }
+
+  // Sem token na URL: exibe tela de autenticação manual (fallback)
+  mostrarAuthOverlay();
 }
 
 function verificarAbertura(){

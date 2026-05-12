@@ -214,13 +214,19 @@
   .alert-banner.show{transform:translateX(-50%) translateY(0);}
 
   /* IMPRESSÃO TÉRMICA */
+  #print-area{
+    position:absolute;left:-9999px;top:0;
+    width:80mm;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;
+  }
   @media print{
-    body *{visibility:hidden;}
-    #print-area, #print-area *{visibility:visible;}
-    #print-area{position:fixed;left:0;top:0;width:80mm;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;}
+    body > *:not(#print-area){display:none!important;}
+    #print-area{
+      position:fixed!important;left:0!important;top:0!important;
+      display:block!important;width:100%!important;
+      font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;
+    }
     @page{margin:0;size:80mm auto;}
   }
-  #print-area{display:none;}
 
   .print-ticket{font-family:'Courier New',monospace;font-size:13px;line-height:1.6;color:black;}
   .print-ticket .pt-center{text-align:center;}
@@ -600,19 +606,39 @@ function registrarPedidoNaMesa(chamado){
   setPedidosMesa(acc);
 }
 
-// Parse da string de obs do chamado
+// Parse da string de obs do chamado — cruza com cardápio local para categoria e preço
 function parseItensChamado(obsStr){
-  // Formato esperado: "2x 001 Cerveja|1x 005 Frango Grelhado|obs:sem sal"
+  if(!obsStr) return [];
+  const cardapio = getCardapio(); // [{id,cat,cod,desc,valor}]
+  const codMap   = {};
+  cardapio.forEach(item => { if(item.cod) codMap[item.cod.toLowerCase()] = item; });
+
   const partes = obsStr.split('|');
-  const itens = [];
+  const itens  = [];
   for(const p of partes){
-    if(p.startsWith('obs:')) continue;
-    const m = p.trim().match(/^(\d+)x\s+(\S+)\s+(.+?)\s+R\$([\d.,]+)$/);
+    const txt = p.trim();
+    if(!txt || txt.startsWith('Obs:') || txt.startsWith('obs:')) continue;
+
+    // Tenta match "Nx COD Descrição" (formato enviado pelo mesa.html)
+    const m = txt.match(/^(\d+)x\s+(\S+)\s+(.+)$/);
     if(m){
-      itens.push({qty:parseInt(m[1]),cod:m[2],desc:m[3],valor:parseFloat(m[4].replace(',','.'))});
-    } else if(p.trim()){
-      // fallback: só texto
-      itens.push({qty:1,cod:'',desc:p.trim(),valor:0});
+      const qty  = parseInt(m[1]);
+      const cod  = m[2];
+      const desc = m[3].trim();
+      // Procura no cardápio pelo código ou pela descrição
+      const found = codMap[cod.toLowerCase()]
+        || cardapio.find(i => i.desc.toLowerCase() === desc.toLowerCase())
+        || cardapio.find(i => desc.toLowerCase().includes(i.desc.toLowerCase()));
+      itens.push({
+        qty,
+        cod,
+        desc,
+        valor: found ? parseFloat(found.valor) : 0,
+        cat:   found ? (found.cat || 'garcom') : 'garcom'
+      });
+    } else {
+      // texto livre sem estrutura
+      itens.push({qty:1, cod:'', desc:txt, valor:0, cat:'garcom'});
     }
   }
   return itens;
@@ -689,11 +715,12 @@ async function renderizar(){
         if(itens.length){
           itensHtml = '<div class="card-itens">'
             + itens.map(it=>{
-                const cat = (c.tipo==='pedido_cozinha') ? 'c' : 'g';
+                const cat = it.cat === 'cozinha' ? 'c' : 'g';
+                const catLabel = cat === 'c' ? 'COZINHA' : 'GARÇOM';
                 return `<div class="card-item-linha">
-                  <span class="item-cat-tag ${cat}">${cat==='g'?'G':'C'}</span>
+                  <span class="item-cat-tag ${cat}" title="${catLabel}">${cat==='g'?'G':'C'}</span>
                   <span class="item-qty">${it.qty}x</span>
-                  <span class="item-nome">${it.cod?it.cod+' ':''} ${it.desc}</span>
+                  <span class="item-nome">${it.cod?'['+it.cod+'] ':''} ${it.desc}</span>
                   ${it.valor>0?`<span class="item-preco">${fmtBrl(it.qty*it.valor)}</span>`:''}
                 </div>`;
               }).join('')
@@ -782,33 +809,53 @@ function imprimirPedido(chamado){
   const cfg   = getConfig();
   const nomeR = cfg.nome || 'Restaurante';
   const itens = parseItensChamado(chamado.obs||'');
-  const info  = getTipoInfo(chamado.tipo);
   const agora = new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 
-  let total = 0;
-  const itensTxt = itens.map(it=>{
-    const sub = it.qty * it.valor; total += sub;
-    return `${String(it.qty+'x').padEnd(4)} ${(it.cod?it.cod+' ':'')+it.desc}\n       ${fmtBrl(sub)}`;
-  }).join('\n');
+  const itensG = itens.filter(i=>i.cat!=='cozinha');
+  const itensC = itens.filter(i=>i.cat==='cozinha');
+  const obsLivre = (chamado.obs||'').split('|').filter(p=>p.trim().startsWith('Obs:')).map(p=>p.replace('Obs:','').trim()).join(', ');
 
-  const ticket = `
-<div class="print-ticket">
-  <div class="pt-center pt-bold">${nomeR}</div>
-  <div class="pt-center">----- PEDIDO -----</div>
-  <div class="pt-line"></div>
-  <div><b>Mesa:</b> ${chamado.mesa} &nbsp; <b>Tipo:</b> ${info.emoji} ${info.label}</div>
-  <div><b>Hora:</b> ${chamado.hora||agora}</div>
-  <div class="pt-line"></div>
-  ${itens.length ? itens.map(it=>{
-      const sub = it.qty*it.valor;
-      return `<div class="pt-row"><span>${it.qty}x ${it.cod?it.cod+' ':''} ${it.desc}</span><span>${it.valor>0?fmtBrl(sub):''}</span></div>`;
-    }).join('') : `<div>${chamado.obs||'—'}</div>`}
-  <div class="pt-line"></div>
-  ${total>0?`<div class="pt-row pt-total"><span>TOTAL</span><span>${fmtBrl(total)}</span></div>`:''}
-  <div class="pt-center" style="margin-top:8px;font-size:11px;">Garçom Digital • ${agora}</div>
-</div>`;
+  let total = itens.reduce((a,i)=>a+(i.qty*i.valor),0);
 
-  document.getElementById('print-area').innerHTML = ticket;
+  const linhaItem = (it)=>{
+    const sub = it.qty*it.valor;
+    const desc = (it.cod?'['+it.cod+'] ':'')+it.desc;
+    const esq  = it.qty+'x '+desc;
+    const dir  = it.valor>0 ? fmtBrl(sub) : '';
+    return `<div class="pt-row"><span style="flex:1;padding-right:4px">${esq}</span><span style="white-space:nowrap">${dir}</span></div>`;
+  };
+
+  let html = `<div class="print-ticket">
+    <div class="pt-center pt-bold" style="font-size:15px;">${nomeR}</div>
+    <div class="pt-center">----- PEDIDO -----</div>
+    <div class="pt-line"></div>
+    <div><b>Mesa:</b> ${chamado.mesa} &nbsp;&nbsp; <b>Hora:</b> ${chamado.hora||agora}</div>
+    <div class="pt-line"></div>`;
+
+  if(itensG.length){
+    html += `<div class="pt-bold">🟠 GARÇOM (Bebidas/Extras)</div>`;
+    html += itensG.map(linhaItem).join('');
+    const subG = itensG.reduce((a,i)=>a+(i.qty*i.valor),0);
+    if(subG>0) html += `<div class="pt-row" style="font-size:11px;color:#555"><span>Subtotal Garçom</span><span>${fmtBrl(subG)}</span></div>`;
+    if(itensC.length) html += `<div class="pt-line"></div>`;
+  }
+  if(itensC.length){
+    html += `<div class="pt-bold">🟢 COZINHA (Pratos)</div>`;
+    html += itensC.map(linhaItem).join('');
+    const subC = itensC.reduce((a,i)=>a+(i.qty*i.valor),0);
+    if(subC>0) html += `<div class="pt-row" style="font-size:11px;color:#555"><span>Subtotal Cozinha</span><span>${fmtBrl(subC)}</span></div>`;
+  }
+  if(obsLivre){
+    html += `<div class="pt-line"></div><div><b>Obs:</b> ${obsLivre}</div>`;
+  }
+  if(total>0){
+    html += `<div class="pt-line"></div>`;
+    html += `<div class="pt-row pt-bold" style="font-size:15px"><span>TOTAL</span><span>${fmtBrl(total)}</span></div>`;
+  }
+  html += `<div class="pt-center" style="margin-top:10px;font-size:11px;">Garçom Digital • ${agora}</div>`;
+  html += `</div>`;
+
+  document.getElementById('print-area').innerHTML = html;
   window.print();
 }
 
@@ -827,7 +874,7 @@ function abrirConta(mesa, chamadoId){
 
   pedidosMesa.forEach(p=>{
     p.itens.forEach(it=>{
-      const dest = (p.tipo==='pedido_cozinha') ? itensC : itensG;
+      const dest = (it.cat === 'cozinha') ? itensC : itensG;
       // Agrupa por cod+desc
       const ex = dest.find(x=>x.desc===it.desc&&x.cod===it.cod);
       if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; }
@@ -934,7 +981,7 @@ function imprimirConta(){
   const itensG=[], itensC=[];
   peds.forEach(p=>{
     p.itens.forEach(it=>{
-      const dest=(p.tipo==='pedido_cozinha')?itensC:itensG;
+      const dest=(it.cat==='cozinha')?itensC:itensG;
       const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod);
       if(ex){ex.qty+=it.qty;ex.sub+=it.qty*it.valor;}
       else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor});

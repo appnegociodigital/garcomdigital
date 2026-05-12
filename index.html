@@ -64,12 +64,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
 .clock{font-size:15px;font-weight:700;color:white;}
 
-.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;}
-.status-pill.aberto{background:rgba(46,201,138,0.2);color:#2EC98A;}
-.status-pill.fechado{background:rgba(239,68,68,0.2);color:#EF4444;}
-.status-pill span.dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
-.status-pill.aberto span.dot{background:#2EC98A;animation:blink 1.5s infinite;}
-.status-pill.fechado span.dot{background:#EF4444;}
+.status-pill{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:900;cursor:pointer;transition:all 0.2s;border:2px solid transparent;white-space:nowrap;}
+.status-pill.aberto{background:#1FA870;color:#fff;border-color:#2EC98A;}
+.status-pill.fechado{background:#DC2626;color:#fff;border-color:#EF4444;}
+.status-pill:hover{filter:brightness(1.15);}
+.status-pill span.dot{width:7px;height:7px;border-radius:50%;display:inline-block;background:rgba(255,255,255,0.8);}
+.status-pill.aberto span.dot{animation:blink 1.5s infinite;}
 
 .nav-tabs{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
 .nav-tab{padding:14px 20px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--gray);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all 0.2s;margin-bottom:-2px;white-space:nowrap;}
@@ -297,11 +297,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
 .perigo-row{display:flex;gap:10px;flex-wrap:wrap;}
 
 #print-area{position:fixed;left:-9999px;top:0;width:80mm;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;visibility:hidden;}
+#qr-print-frame{display:none;}
 @media print{
-  *{visibility:hidden!important;}
-  #print-area,#print-area *{visibility:visible!important;}
-  #print-area{position:fixed!important;left:0!important;top:0!important;width:100%!important;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;}
-  @page{margin:0;size:80mm auto;}
+  body *{visibility:hidden!important;}
+  #print-area{visibility:visible!important;position:fixed!important;left:0!important;top:0!important;width:100%!important;height:auto!important;}
+  #print-area *{visibility:visible!important;}
+  #qr-print-frame{display:none!important;}
+  @page{margin:4mm;size:80mm auto;}
 }
 .print-ticket{font-family:'Courier New',monospace;font-size:13px;line-height:1.6;color:black;}
 .print-ticket .pt-center{text-align:center;}
@@ -621,6 +623,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
       </div>
       <button class="btn green" onclick="adicionarItem()" style="margin-top:18px">+ Adicionar</button>
     </div>
+    <div style="margin-top:12px;padding:10px 14px;background:var(--blue-light);border-radius:10px;font-size:12px;color:var(--blue-dark);font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <span>☁️ Cardápio sincronizado automaticamente com os clientes via nuvem.</span>
+      <button class="btn blue" style="padding:6px 14px;font-size:12px;" onclick="sincronizarCardapio()">🔄 Forçar Sync</button>
+    </div>
   </div>
 </div>
 
@@ -832,7 +838,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
     <div class="link-box" id="qr-link-box"></div>
     <div class="modal-btns">
       <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
-      <button class="btn-copiar" onclick="copiarLink()">📋 Copiar Link</button>
+      <button class="btn-copiar" onclick="imprimirQRCode()">🖨️ Imprimir QR</button>
+      <button class="btn-copiar" style="background:var(--blue)" onclick="copiarLink()">📋 Copiar Link</button>
     </div>
   </div>
 </div>
@@ -1381,10 +1388,31 @@ function fecharModalSenha(){ document.getElementById('modal-senha').classList.re
 function confirmarSenha(){ const val=document.getElementById('senha-input').value; if(val!==SENHA_PERIGO){ document.getElementById('senha-error').style.display='block'; document.getElementById('senha-input').value=''; document.getElementById('senha-input').focus(); return; } fecharModalSenha(); if(perigoAcaoPendente==='limparHistoricoLocal') limparHistoricoLocal(); else if(perigoAcaoPendente==='limparCardapio') limparCardapio(); else if(perigoAcaoPendente==='limparTudo') limparTudo(); }
 
 // ====================================================
-// CARDÁPIO
+// CARDÁPIO — salva local + Supabase para acesso dos clientes
 // ====================================================
 function getCardapio(){ try{ return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]'); }catch{ return []; } }
-function saveCardapio(arr){ localStorage.setItem(CARDAPIO_KEY,JSON.stringify(arr)); }
+function saveCardapio(arr){
+  localStorage.setItem(CARDAPIO_KEY, JSON.stringify(arr));
+  // Sincroniza com Supabase para que clientes (outros dispositivos) possam acessar
+  fetch(SUPABASE_URL+'/rest/v1/config', {
+    method:'POST',
+    headers:{...HEADERS,'Prefer':'resolution=merge-duplicates'},
+    body: JSON.stringify({id:1, cardapio_json: JSON.stringify(arr)})
+  }).catch(()=>{});
+}
+
+// Lê cardápio do Supabase (usado pelo lado mesa/cliente)
+async function mesaGetCardapio(){
+  try{
+    const r = await mesaApiGet('config?id=eq.1&select=cardapio_json');
+    if(r.length && r[0].cardapio_json){
+      const items = JSON.parse(r[0].cardapio_json);
+      localStorage.setItem(CARDAPIO_KEY, JSON.stringify(items));
+      return items;
+    }
+  }catch(e){}
+  return getCardapio(); // fallback local (mesmo dispositivo/testes)
+}
 
 function renderCardapio(){
   const items=getCardapio();
@@ -1453,6 +1481,18 @@ function selecionarTodosDisp(cat, disponivel){
 function adicionarItem(){ const cat=document.getElementById('new-cat').value; const cod=document.getElementById('new-cod').value.trim(); const desc=document.getElementById('new-desc').value.trim(); const valor=document.getElementById('new-valor').value; if(!cod||!desc||!valor){ mostrarAlerta('⚠️ Preencha código, descrição e valor!'); return; } const items=getCardapio(); items.push({id:Date.now().toString(),cat,cod,desc,valor:parseFloat(valor)}); saveCardapio(items); document.getElementById('new-cod').value=''; document.getElementById('new-desc').value=''; document.getElementById('new-valor').value=''; renderCardapio(); mostrarAlerta('✅ Item adicionado!'); }
 function removerItem(id){ saveCardapio(getCardapio().filter(i=>i.id!==id)); renderCardapio(); }
 function limparCardapio(){ saveCardapio([]); renderCardapio(); mostrarAlerta('Cardápio limpo!'); }
+
+async function sincronizarCardapio(){
+  const items = getCardapio();
+  try{
+    await fetch(SUPABASE_URL+'/rest/v1/config', {
+      method:'POST',
+      headers:{...HEADERS,'Prefer':'resolution=merge-duplicates'},
+      body: JSON.stringify({id:1, cardapio_json: JSON.stringify(items)})
+    });
+    mostrarAlerta('☁️ Cardápio sincronizado com sucesso!');
+  }catch(e){ mostrarAlerta('❌ Erro ao sincronizar. Verifique a conexão.'); }
+}
 function limparHistoricoLocal(){ localStorage.removeItem(HISTORY_KEY); renderizar(); mostrarAlerta('Histórico limpo!'); }
 
 // ====================================================
@@ -1517,6 +1557,43 @@ function gerarMultiplosQR(){
 function fecharModal(){ document.getElementById('modal').classList.remove('show'); }
 function copiarLink(){ navigator.clipboard.writeText(qrLinkAtual).then(()=>{ mostrarAlerta('✅ Link copiado!'); fecharModal(); }); }
 
+function imprimirQRCode(){
+  const cfg=getConfig();
+  const mesaNum=document.getElementById('qr-mesa-num').textContent;
+  const msg=document.getElementById('qr-etiqueta-msg').textContent;
+  const nomeRest=cfg.nome||'Restaurante';
+  // Captura o QR como imagem canvas→dataURL
+  const qrCanvas=document.querySelector('#qr-container canvas');
+  const qrImg=document.querySelector('#qr-container img');
+  let qrSrc='';
+  if(qrCanvas) qrSrc=qrCanvas.toDataURL('image/png');
+  else if(qrImg) qrSrc=qrImg.src;
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',Arial,sans-serif;background:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    .etiqueta{background:#1A1A2E;border-radius:14px;padding:20px 24px;text-align:center;max-width:280px;width:100%;}
+    .msg{color:white;font-size:13px;font-weight:900;margin-bottom:12px;line-height:1.4;}
+    .qr-wrap{background:white;border-radius:10px;padding:12px;display:inline-block;margin-bottom:12px;}
+    .qr-wrap img{display:block;width:200px;height:200px;}
+    .mesa{color:#FF6B35;font-size:24px;font-weight:900;}
+    .nome{color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;margin-top:4px;}
+  </style></head><body>
+  <div class="etiqueta">
+    <div class="msg">${msg}</div>
+    <div class="qr-wrap"><img src="${qrSrc}"></div>
+    <div class="mesa">Mesa ${mesaNum}</div>
+    <div class="nome">${nomeRest}</div>
+  </div>
+  <script>window.onload=function(){window.print();setTimeout(()=>window.close(),800);}<\/script>
+  </body></html>`;
+
+  const w=window.open('','_blank','width=400,height=500');
+  w.document.write(html);
+  w.document.close();
+}
+
 // ====================================================
 // PAGES
 // ====================================================
@@ -1539,6 +1616,9 @@ async function inicializarPainel(){
   await carregarSessoes();
   renderMesasSessoes();
   renderizar();
+  // Sincroniza cardápio local com Supabase (para clientes em outros dispositivos)
+  const cardapioLocal = getCardapio();
+  if(cardapioLocal.length > 0) saveCardapio(cardapioLocal);
 }
 
 // ====================================================
@@ -1663,7 +1743,8 @@ async function inicializarMesa(){
   // Verifica horário
   verificarAbertura();
 
-  mesaTodosItens = getCardapio().filter(i=>!i.indisponivel);
+  // Cardápio carregado do Supabase para funcionar em qualquer dispositivo
+  mesaTodosItens = (await mesaGetCardapio()).filter(i=>!i.indisponivel);
   mesaRenderItensPedido(mesaTodosItens);
   document.getElementById('obs-pedido').addEventListener('input', mesaAtualizarBotao);
 
@@ -1834,7 +1915,7 @@ async function mesaCancelarPedido(){
 }
 
 async function mesaInit(){
-  mesaTodosItens=getCardapio().filter(i=>!i.indisponivel); mesaRenderItensPedido(mesaTodosItens);
+  mesaTodosItens=(await mesaGetCardapio()).filter(i=>!i.indisponivel); mesaRenderItensPedido(mesaTodosItens);
   try{
     const lista=await mesaApiGet('chamados?mesa=eq.'+mesaNum+'&status=eq.pendente&order=created_at.desc&limit=1');
     if(lista.length){ mesaChamadoAtivoId=lista[0].id; if(lista[0].tipo==='pedido'||lista[0].tipo==='pedido_garcom'){ mesaPedidoAtivoId=lista[0].id; document.getElementById('ps-itens-text').textContent=lista[0].obs||''; document.getElementById('status-preparando').classList.add('show'); document.getElementById('btn-cancelar-pedido').classList.add('show'); } }
@@ -1842,11 +1923,11 @@ async function mesaInit(){
   }catch(e){ mesaSetConexao('offline'); }
 }
 
-function mesaRenderCardapioDownload(){
+async function mesaRenderCardapioDownload(){
   const cont=document.getElementById('dl-content'); cont.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;">⏳ Carregando...</div>';
   const arquivoRaw=localStorage.getItem(CARDAPIO_FILE_KEY); const arquivoNome=localStorage.getItem(CARDAPIO_FILE_NAME)||'Cardápio';
-  // Apenas itens disponíveis para o cliente
-  const allItems=getCardapio(); const items=allItems.filter(i=>!i.indisponivel);
+  // Carrega do Supabase para garantir acesso cross-device
+  const allItems=await mesaGetCardapio(); const items=allItems.filter(i=>!i.indisponivel);
   const gItems=items.filter(i=>i.cat==='garcom'||!i.cat); const cItems=items.filter(i=>i.cat==='cozinha');
   let html='';
   if(arquivoRaw){ const isPdf=arquivoRaw.startsWith('data:application/pdf')||arquivoRaw.toLowerCase().includes('.pdf')||(arquivoNome&&arquivoNome.toLowerCase().endsWith('.pdf')); html+='<div style="margin-bottom:14px"><div class="arquivo-header-lbl">📄 '+arquivoNome+'</div><div class="arquivo-inline">'+(isPdf?'<iframe src="'+arquivoRaw+'" style="width:100%;height:480px;border:none;display:block;"></iframe>':'<img src="'+arquivoRaw+'" alt="Cardápio" loading="lazy" style="width:100%;display:block;">')+'</div></div>'; }

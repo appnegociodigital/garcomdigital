@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#e8a020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Painel — Restaurante</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f0;min-height:100vh;padding-bottom:60px}
+.header{background:#e8a020;color:#fff;padding:.8rem 1.2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:18px;font-weight:700}
+.hright{display:flex;gap:.5rem;align-items:center}
+.hright span{font-size:13px;opacity:.85}
+.bsm{padding:.35rem .7rem;border:1.5px solid rgba(255,255,255,.5);border-radius:8px;background:transparent;color:#fff;font-size:12px;cursor:pointer}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e0e0e0;overflow-x:auto}
+.tab{padding:.8rem 1.1rem;font-size:14px;font-weight:500;cursor:pointer;color:#888;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0}
+.tab.ativo{color:#e8a020;border-color:#e8a020}
+.badge{background:#e74c3c;color:#fff;font-size:10px;padding:2px 5px;border-radius:8px;margin-left:4px}
+.cont{padding:1rem;max-width:900px;margin:0 auto}
+/* chamadas */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.7rem}
+.ccard{background:#fff;border-radius:12px;padding:.9rem;border-left:4px solid #e74c3c;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.ccard.ok{border-color:#27ae60;opacity:.55}
+.cmesa{font-size:26px;font-weight:700}
+.cinfo{font-size:11px;color:#999;margin:.2rem 0}
+.cbtn{width:100%;margin-top:.5rem;padding:.35rem;background:#27ae60;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer}
+/* pedidos */
+.filtros{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap}
+.fb{padding:.35rem .8rem;border:1.5px solid #e0e0e0;border-radius:18px;background:#fff;color:#666;font-size:13px;cursor:pointer}
+.fb.ativo{border-color:#e8a020;background:#fff8ed;color:#e8a020}
+.pcard{background:#fff;border-radius:12px;margin-bottom:.7rem;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.phead{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid #f0f0f0}
+.pmesa{font-size:16px;font-weight:700}
+.phora{font-size:11px;color:#aaa;margin-top:2px}
+.sbadge{font-size:11px;padding:3px 9px;border-radius:8px;font-weight:500}
+.s-pendente{background:#fff3cd;color:#856404}
+.s-preparo{background:#cce5ff;color:#004085}
+.s-pronto{background:#d4edda;color:#155724}
+.s-entregue{background:#e2e3e5;color:#383d41}
+.pitens{padding:.75rem 1rem}
+.plinha{display:flex;align-items:center;gap:.6rem;padding:.3rem 0;border-bottom:.5px solid #f5f5f5;font-size:14px}
+.plinha:last-child{border:none}
+.pqtd{background:#f0f0f0;border-radius:6px;padding:2px 7px;font-size:12px;font-weight:600;min-width:28px;text-align:center}
+.pnome{flex:1}
+.ppreco{font-size:12px;color:#aaa}
+.pfoot{padding:.6rem 1rem;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;gap:.4rem}
+.ptotal{font-weight:700;font-size:15px}
+.pacoes{display:flex;gap:.3rem}
+.ba{padding:.32rem .65rem;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-weight:500}
+.ba-av{background:#e8a020;color:#fff}
+.ba-im{background:#3498db;color:#fff}
+.ba-del{background:#e74c3c;color:#fff}
+/* grupos */
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.8rem}
+.gcard{background:#fff;border-radius:12px;padding:1.1rem;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.gnome{font-size:15px;font-weight:700;margin-bottom:.2rem}
+.ggarcom{font-size:13px;color:#e8a020;margin-bottom:.7rem}
+.mchips{display:flex;flex-wrap:wrap;gap:.3rem}
+.mc{background:#f0f0f0;border-radius:7px;padding:3px 9px;font-size:12px;font-weight:500}
+.mc.chamando{background:#fde8e8;color:#c0392b;animation:pls .8s infinite}
+.mc.pedido{background:#fff3cd;color:#856404}
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.4}}
+.gbts{display:flex;gap:.4rem;margin-top:.7rem}
+.gbt{padding:.35rem .7rem;border:1.5px solid #e0e0e0;border-radius:7px;background:transparent;color:#666;font-size:12px;cursor:pointer}
+.gbt:hover{border-color:#e8a020;color:#e8a020}
+/* modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;z-index:200}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:1.5rem;width:90%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:1.1rem}
+.campo{margin-bottom:.9rem}
+.campo label{display:block;font-size:13px;font-weight:500;color:#444;margin-bottom:.3rem}
+.campo input,.campo select{width:100%;padding:.6rem .9rem;border:1.5px solid #e0e0e0;border-radius:9px;font-size:14px;outline:none}
+.campo input:focus,.campo select:focus{border-color:#e8a020}
+.mbtns{display:flex;gap:.5rem;margin-top:1rem}
+.bp{flex:1;padding:.65rem;background:#e8a020;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.bs{flex:1;padding:.65rem;background:#f0f0f0;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer}
+.mt{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.4rem}
+.mt span{padding:3px 9px;border:1.5px solid #e0e0e0;border-radius:7px;cursor:pointer;font-size:13px;background:#fff}
+.mt span.sel{border-color:#e8a020;background:#fff8ed;color:#e8a020}
+.empty{text-align:center;color:#bbb;padding:2rem;font-size:14px}
+/* toast */
+.toast{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:.65rem 1.2rem;border-radius:12px;font-size:14px;z-index:999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🍽️ Painel</h1>
+  <div class="hright">
+    <span id="nomeUser"></span>
+    <button class="bsm" onclick="irConfig()">⚙️</button>
+    <button class="bsm" onclick="sair()">Sair</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab ativo" onclick="tab('chamadas',this)">📣 Chamadas<span class="badge" id="bc" style="display:none">0</span></div>
+  <div class="tab" onclick="tab('pedidos',this)">🛎️ Pedidos<span class="badge" id="bp2" style="display:none">0</span></div>
+  <div class="tab" onclick="tab('grupos',this)">🗂️ Grupos</div>
+</div>
+
+<div class="cont">
+  <div id="t-chamadas">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
+      <strong style="font-size:15px">Chamadas das Mesas</strong>
+      <button class="fb" onclick="limparAtendidas()">Limpar atendidas</button>
+    </div>
+    <div class="cgrid" id="lista-chamadas"><div class="empty">Nenhuma chamada</div></div>
+  </div>
+
+  <div id="t-pedidos" style="display:none">
+    <div class="filtros">
+      <button class="fb ativo" onclick="filtrar('todos',this)">Todos</button>
+      <button class="fb" onclick="filtrar('pendente',this)">Pendente</button>
+      <button class="fb" onclick="filtrar('pronto',this)">Pronto</button>
+      <button class="fb" onclick="filtrar('entregue',this)">Entregue</button>
+    </div>
+    <div id="lista-pedidos"></div>
+  </div>
+
+  <div id="t-grupos" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
+      <strong style="font-size:15px">Grupos de Mesas</strong>
+      <button class="bp" style="flex:none;padding:.45rem .9rem;font-size:13px" onclick="abrirGrupo()">+ Novo</button>
+    </div>
+    <div class="ggrid" id="lista-grupos"></div>
+  </div>
+</div>
+
+<!-- Modal Grupo -->
+<div class="modal-bg" id="modal-grupo">
+<div class="modal">
+  <h2 id="mg-titulo">Novo Grupo</h2>
+  <input type="hidden" id="g-id">
+  <div class="campo"><label>Nome do grupo</label><input id="g-nome" placeholder="Ex: Salão Principal"></div>
+  <div class="campo"><label>Nome do garçom</label><input id="g-garcom" placeholder="Ex: João"></div>
+  <div class="campo"><label>Mesas</label><div class="mt" id="mt-sel"></div></div>
+  <div class="mbtns">
+    <button class="bs" onclick="fechar('modal-grupo')">Cancelar</button>
+    <button class="bp" onclick="salvarGrupo()">Salvar</button>
+  </div>
+</div>
+</div>
+
+<!-- Modal Senha -->
+<div class="modal-bg" id="modal-senha">
+<div class="modal">
+  <h2>🔒 Confirmar senha</h2>
+  <p style="font-size:14px;color:#666;margin-bottom:.8rem">Digite sua senha para acessar as configurações.</p>
+  <div class="campo"><label>Senha</label><input type="password" id="cs" placeholder="sua senha"></div>
+  <div id="cs-erro" style="color:#e74c3c;font-size:13px;display:none">Senha incorreta</div>
+  <div class="mbtns">
+    <button class="bs" onclick="fechar('modal-senha')">Cancelar</button>
+    <button class="bp" onclick="confSenha()">Confirmar</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="app.js"></script>
+<script>
+const SB = getSB();
+let usuario, chamadas=[], pedidosGarcom=[], grupos=[], filtroSt='todos', mesasSel=[];
+
+// Init
+(async () => {
+  usuario = checarAuth(['admin','garcom']);
+  if (!usuario) return;
+  document.getElementById('nomeUser').textContent = usuario.nome;
+  await Promise.all([carregarChamadas(), carregarPedidos(), carregarGrupos()]);
+  assinarRealtime();
+})();
+
+function tab(id, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('ativo'));
+  el.classList.add('ativo');
+  ['chamadas','pedidos','grupos'].forEach(t=> document.getElementById('t-'+t).style.display = t===id?'':'none');
+  if (id==='grupos') renderGrupos();
+}
+
+// ── CHAMADAS ──────────────────────────────────────────────────────────────────
+async function carregarChamadas() {
+  const {data} = await SB.from('chamadas').select('*').order('criado_em',{ascending:false}).limit(50);
+  chamadas = data || [];
+  renderChamadas();
+}
+
+function renderChamadas() {
+  const ativas = chamadas.filter(c=>!c.atendida).length;
+  const bc = document.getElementById('bc');
+  bc.textContent = ativas; bc.style.display = ativas?'':'none';
+  const el = document.getElementById('lista-chamadas');
+  if (!chamadas.length) { el.innerHTML='<div class="empty">Nenhuma chamada</div>'; return; }
+  el.innerHTML = chamadas.slice(0,30).map(c=>`
+    <div class="ccard ${c.atendida?'ok':''}">
+      <div class="cmesa">Mesa ${c.mesa}</div>
+      <div class="cinfo">${new Date(c.criado_em).toLocaleTimeString('pt-BR')}</div>
+      <div class="cinfo" style="color:#e8a020">${c.garcom||''}</div>
+      ${!c.atendida?`<button class="cbtn" onclick="atenderChamada(${c.id})">✓ Atendida</button>`:'<div style="font-size:11px;color:#27ae60;text-align:center;margin-top:.4rem">✓ Atendida</div>'}
+    </div>`).join('');
+}
+
+async function atenderChamada(id) {
+  await SB.from('chamadas').update({atendida:true}).eq('id',id);
+  carregarChamadas();
+}
+
+function limparAtendidas() {
+  chamadas = chamadas.filter(c=>!c.atendida);
+  renderChamadas();
+}
+
+// ── PEDIDOS ───────────────────────────────────────────────────────────────────
+async function carregarPedidos() {
+  const {data} = await SB.from('pedidos').select('*').eq('tipo','garcom').order('criado_em',{ascending:false});
+  pedidosGarcom = data || [];
+  const pend = pedidosGarcom.filter(p=>p.status==='pendente').length;
+  const bp2 = document.getElementById('bp2');
+  bp2.textContent = pend; bp2.style.display = pend?'':'none';
+  renderPedidos();
+}
+
+const SL = {pendente:'Pendente',preparo:'Em preparo',pronto:'Pronto',entregue:'Entregue'};
+const SP = {pendente:'preparo',preparo:'pronto',pronto:'entregue'};
+
+function filtrar(st,el) {
+  filtroSt=st;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('ativo'));
+  el.classList.add('ativo');
+  renderPedidos();
+}
+
+function renderPedidos() {
+  const el = document.getElementById('lista-pedidos');
+  let lista = filtroSt==='todos'?pedidosGarcom:pedidosGarcom.filter(p=>p.status===filtroSt);
+  if (!lista.length) { el.innerHTML='<div class="empty">Nenhum pedido</div>'; return; }
+  el.innerHTML = lista.map(p=>`
+    <div class="pcard">
+      <div class="phead">
+        <div><div class="pmesa">Mesa ${p.mesa}</div><div class="phora">Pedido #${p.id} — ${new Date(p.criado_em).toLocaleTimeString('pt-BR')}</div></div>
+        <span class="sbadge s-${p.status}">${SL[p.status]||p.status}</span>
+      </div>
+      <div class="pitens">
+        ${p.itens.map(i=>`<div class="plinha"><span class="pqtd">${i.qtd}x</span><span class="pnome">${i.nome}</span><span class="ppreco">R$${(i.preco*i.qtd).toFixed(2)}</span></div>`).join('')}
+      </div>
+      <div class="pfoot">
+        <span class="ptotal">R$ ${Number(p.total).toFixed(2)}</span>
+        <div class="pacoes">
+          ${SP[p.status]?`<button class="ba ba-av" onclick="avancar(${p.id},'${SP[p.status]}')">→ ${SL[SP[p.status]]}</button>`:''}
+          <button class="ba ba-im" onclick="imprimirPedido(${JSON.stringify(p).replace(/"/g,'&quot;')})">🖨️</button>
+          <button class="ba ba-del" onclick="excluirPedido(${p.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function avancar(id, st) {
+  await SB.from('pedidos').update({status:st}).eq('id',id);
+  carregarPedidos();
+}
+
+async function excluirPedido(id) {
+  if (!confirm('Excluir este pedido?')) return;
+  await SB.from('pedidos').delete().eq('id',id);
+  carregarPedidos();
+}
+
+// ── GRUPOS ────────────────────────────────────────────────────────────────────
+async function carregarGrupos() {
+  const {data} = await SB.from('grupos').select('*').order('id');
+  grupos = data || [];
+}
+
+async function renderGrupos() {
+  await carregarGrupos();
+  const {data: ped} = await SB.from('pedidos').select('mesa,status').neq('status','entregue');
+  const {data: cham} = await SB.from('chamadas').select('mesa,atendida').eq('atendida',false);
+  const mesasPed = new Set((ped||[]).map(p=>Number(p.mesa)));
+  const mesasCham = new Set((cham||[]).map(c=>Number(c.mesa)));
+  const el = document.getElementById('lista-grupos');
+  if (!grupos.length) { el.innerHTML='<div class="empty">Nenhum grupo</div>'; return; }
+  el.innerHTML = grupos.map(g=>`
+    <div class="gcard">
+      <div class="gnome">${g.nome}</div>
+      <div class="ggarcom">👤 ${g.garcom||'Sem garçom'}</div>
+      <div class="mchips">${g.mesas.map(m=>`<span class="mc ${mesasCham.has(m)?'chamando':mesasPed.has(m)?'pedido':''}">Mesa ${m}</span>`).join('')}</div>
+      <div class="gbts">
+        <button class="gbt" onclick="editarGrupo(${g.id})">✏️ Editar</button>
+        <button class="gbt" style="color:#e74c3c" onclick="excluirGrupo(${g.id})">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function abrirGrupo() {
+  document.getElementById('mg-titulo').textContent='Novo Grupo';
+  document.getElementById('g-id').value='';
+  document.getElementById('g-nome').value='';
+  document.getElementById('g-garcom').value='';
+  mesasSel=[];
+  renderMesasSel();
+  document.getElementById('modal-grupo').classList.add('open');
+}
+
+async function editarGrupo(id) {
+  const g = grupos.find(x=>x.id===id); if(!g) return;
+  document.getElementById('mg-titulo').textContent='Editar Grupo';
+  document.getElementById('g-id').value=id;
+  document.getElementById('g-nome').value=g.nome;
+  document.getElementById('g-garcom').value=g.garcom;
+  mesasSel=[...g.mesas];
+  renderMesasSel();
+  document.getElementById('modal-grupo').classList.add('open');
+}
+
+function renderMesasSel() {
+  const el = document.getElementById('mt-sel');
+  el.innerHTML = Array.from({length:30},(_,i)=>i+1).map(n=>`<span class="${mesasSel.includes(n)?'sel':''}" onclick="toggleMesa(${n})">${n}</span>`).join('');
+}
+
+function toggleMesa(n) {
+  const i=mesasSel.indexOf(n);
+  if(i>=0) mesasSel.splice(i,1); else mesasSel.push(n);
+  mesasSel.sort((a,b)=>a-b);
+  renderMesasSel();
+}
+
+async function salvarGrupo() {
+  const id=document.getElementById('g-id').value;
+  const nome=document.getElementById('g-nome').value.trim();
+  const garcom=document.getElementById('g-garcom').value.trim();
+  if(!nome){alert('Informe o nome do grupo');return;}
+  const body={nome,garcom,mesas:mesasSel};
+  if(id) await SB.from('grupos').update(body).eq('id',id);
+  else   await SB.from('grupos').insert(body);
+  fechar('modal-grupo');
+  renderGrupos();
+}
+
+async function excluirGrupo(id) {
+  if(!confirm('Excluir grupo?'))return;
+  await SB.from('grupos').delete().eq('id',id);
+  renderGrupos();
+}
+
+// ── CONFIG (senha) ────────────────────────────────────────────────────────────
+function irConfig() {
+  document.getElementById('cs').value='';
+  document.getElementById('cs-erro').style.display='none';
+  document.getElementById('modal-senha').classList.add('open');
+}
+
+async function confSenha() {
+  const ok = await verificarSenha(usuario.id, document.getElementById('cs').value);
+  if(ok){ fechar('modal-senha'); sessionStorage.setItem('confSenha','1'); location.href='config.html'; }
+  else document.getElementById('cs-erro').style.display='block';
+}
+
+function fechar(id){ document.getElementById(id).classList.remove('open'); }
+
+// ── REALTIME ──────────────────────────────────────────────────────────────────
+function assinarRealtime() {
+  assinarTabela('chamadas', payload => {
+    if (payload.eventType === 'INSERT') {
+      const c = payload.new;
+      chamadas.unshift(c);
+      renderChamadas();
+      falar(c.garcom ? `${c.garcom}, mesa ${c.mesa} chamando` : `Mesa ${c.mesa} chamando`);
+      toast(`🔔 Mesa ${c.mesa} chamando!`, 'info');
+    }
+    if (payload.eventType === 'UPDATE') { carregarChamadas(); }
+  });
+  assinarTabela('pedidos', () => carregarPedidos());
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+-- ================================================================
+-- SISTEMA RESTAURANTE — Execute no SQL Editor do Supabase
+-- supabase.com → seu projeto → SQL Editor → New Query → Run
+-- ================================================================
+
+-- USUÁRIOS
+create table if not exists usuarios (
+  id bigint generated always as identity primary key,
+  nome text not null unique,
+  senha text not null default '1234',
+  perfil text not null default 'garcom' check (perfil in ('admin','garcom','cozinha')),
+  ativo boolean not null default true,
+  criado_em timestamptz default now()
+);
+
+-- GRUPOS DE MESAS
+create table if not exists grupos (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  garcom text not null default '',
+  mesas integer[] not null default '{}',
+  criado_em timestamptz default now()
+);
+
+-- CARDÁPIO
+create table if not exists cardapio (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  preco numeric(10,2) not null default 0,
+  categoria text not null default 'Geral',
+  tipo text not null default 'garcom' check (tipo in ('garcom','cozinha')),
+  disponivel boolean not null default true,
+  criado_em timestamptz default now()
+);
+
+-- CHAMADAS DE MESA
+create table if not exists chamadas (
+  id bigint generated always as identity primary key,
+  mesa integer not null,
+  atendida boolean not null default false,
+  garcom text default '',
+  grupo_nome text default '',
+  criado_em timestamptz default now()
+);
+
+-- PEDIDOS
+create table if not exists pedidos (
+  id bigint generated always as identity primary key,
+  mesa integer not null,
+  itens jsonb not null default '[]',
+  tipo text not null default 'garcom' check (tipo in ('garcom','cozinha')),
+  status text not null default 'pendente' check (status in ('pendente','preparo','pronto','entregue')),
+  total numeric(10,2) not null default 0,
+  criado_em timestamptz default now()
+);
+
+-- KEEPALIVE (tabela mínima só para o ping de keep-alive)
+create table if not exists keepalive (
+  id bigint generated always as identity primary key,
+  ping timestamptz default now()
+);
+insert into keepalive default values;
+
+-- ================================================================
+-- DESABILITAR RLS (Row Level Security) para acesso com anon key
+-- Em produção real, configure policies adequadas
+-- ================================================================
+alter table usuarios disable row level security;
+alter table grupos disable row level security;
+alter table cardapio disable row level security;
+alter table chamadas disable row level security;
+alter table pedidos disable row level security;
+alter table keepalive disable row level security;
+
+-- ================================================================
+-- HABILITAR REALTIME em todas as tabelas relevantes
+-- ================================================================
+alter publication supabase_realtime add table chamadas;
+alter publication supabase_realtime add table pedidos;
+alter publication supabase_realtime add table grupos;
+alter publication supabase_realtime add table cardapio;
+
+-- ================================================================
+-- DADOS INICIAIS
+-- ================================================================
+insert into usuarios (nome, senha, perfil) values
+  ('admin',    '1234', 'admin'),
+  ('garcom1',  '1234', 'garcom'),
+  ('cozinha1', '1234', 'cozinha')
+on conflict (nome) do nothing;
+
+insert into grupos (nome, garcom, mesas) values
+  ('Salão A', 'garcom1', '{1,2,3,4,5}'),
+  ('Salão B', 'garcom1', '{6,7,8,9,10}')
+on conflict do nothing;
+
+insert into cardapio (nome, preco, categoria, tipo) values
+  ('Cerveja 600ml',    12.00, 'Bebidas',          'garcom'),
+  ('Refrigerante Lata', 6.00, 'Bebidas',          'garcom'),
+  ('Água Mineral',      4.00, 'Bebidas',          'garcom'),
+  ('Suco Natural',      8.00, 'Bebidas',          'garcom'),
+  ('Picanha 300g',     65.00, 'Carnes',           'cozinha'),
+  ('Frango Grelhado',  38.00, 'Carnes',           'cozinha'),
+  ('Batata Frita',     18.00, 'Acompanhamentos',  'cozinha'),
+  ('Arroz e Feijão',   12.00, 'Acompanhamentos',  'cozinha'),
+  ('Salada Mista',     15.00, 'Entradas',         'cozinha'),
+  ('Pão de Alho',      10.00, 'Entradas',         'cozinha')
+on conflict do nothing;

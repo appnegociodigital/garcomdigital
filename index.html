@@ -442,6 +442,23 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
 .mesa-footer{text-align:center;padding:12px 0 6px;font-size:11px;color:#ccc;font-weight:600;}
 
 .tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;background:var(--red);color:white;border-radius:9px;font-size:11px;font-weight:900;margin-left:6px;padding:0 4px;}
+
+/* ====== DISPONIBILIDADE DO CARDÁPIO ====== */
+.cardapio-table td.td-disp{text-align:center;width:40px;}
+.btn-disp{width:30px;height:30px;border:none;border-radius:8px;cursor:pointer;font-size:16px;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.btn-disp.disponivel{background:var(--green-light);color:var(--green-dark);}
+.btn-disp.indisponivel{background:var(--red-light);color:var(--red-dark);}
+.cardapio-table tr.indisponivel td{opacity:0.45;text-decoration:line-through;}
+.cardapio-table tr.indisponivel td.td-disp,.cardapio-table tr.indisponivel td.td-acoes{opacity:1;text-decoration:none;}
+.cardapio-sel-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.cardapio-sel-bar label{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;cursor:pointer;}
+.cardapio-sel-bar input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--orange);}
+.badge-indisp{display:inline-block;background:var(--red-light);color:var(--red-dark);font-size:10px;font-weight:900;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;}
+
+/* ====== CANCELAR PEDIDO (mesa) ====== */
+.btn-cancelar-pedido{width:100%;padding:11px;border:2px solid var(--red);border-radius:12px;background:var(--red-light);color:var(--red-dark);font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-top:10px;transition:all 0.2s;display:none;}
+.btn-cancelar-pedido.show{display:block;}
+.btn-cancelar-pedido:hover{background:var(--red);color:white;}
 </style>
 </head>
 <body>
@@ -563,14 +580,22 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
     <div class="settings-row-title">📋 Itens do Cardápio Digital</div>
     <div class="cat-header garcom">🟠 Garçom — Bebidas & Extras</div>
     <div id="cardapio-empty-garcom" style="padding:10px 12px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado.</div>
+    <div class="cardapio-sel-bar" id="sel-bar-garcom" style="display:none">
+      <label><input type="checkbox" id="sel-all-garcom" onchange="selecionarTodosDisp('garcom',this.checked)"> Selecionar Tudo (disponível)</label>
+      <span id="indisp-count-garcom" class="badge-indisp" style="display:none"></span>
+    </div>
     <table class="cardapio-table" id="table-garcom" style="display:none">
-      <thead><tr><th>Cód.</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <thead><tr><th style="width:40px">✓</th><th>Cód.</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
       <tbody id="tbody-garcom"></tbody>
     </table>
     <div class="cat-header cozinha" style="margin-top:16px;">🟢 Cozinha — Pratos & Refeições</div>
     <div id="cardapio-empty-cozinha" style="padding:10px 12px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado.</div>
+    <div class="cardapio-sel-bar" id="sel-bar-cozinha" style="display:none">
+      <label><input type="checkbox" id="sel-all-cozinha" onchange="selecionarTodosDisp('cozinha',this.checked)"> Selecionar Tudo (disponível)</label>
+      <span id="indisp-count-cozinha" class="badge-indisp" style="display:none"></span>
+    </div>
     <table class="cardapio-table" id="table-cozinha" style="display:none">
-      <thead><tr><th>Cód.</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <thead><tr><th style="width:40px">✓</th><th>Cód.</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
       <tbody id="tbody-cozinha"></tbody>
     </table>
     <div class="add-item-form">
@@ -651,7 +676,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
     </div>
     <div class="horario-toggle">
       <label class="toggle-switch">
-        <input type="checkbox" id="cfg-manual-aberto" onchange="salvarConfig(); atualizarStatusPill();">
+        <input type="checkbox" id="cfg-manual-aberto" onchange="onManualCheckChange(this)">
       </label>
       <div style="flex:1">
         <div class="toggle-label">🔧 Controle Manual de Abertura</div>
@@ -701,6 +726,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
       <div class="ps-title"><span class="pulse-ring"></span>Pedido sendo preparado!</div>
       <div class="ps-sub">Em breve será entregue à sua mesa 😊</div>
       <div class="ps-itens" id="ps-itens-text"></div>
+      <button class="btn-cancelar-pedido" id="btn-cancelar-pedido" onclick="mesaCancelarPedido()">❌ Cancelar Pedido</button>
     </div>
     <div class="pedido-status entregue" id="status-entregue">
       <div class="ps-icon">✅</div>
@@ -1050,20 +1076,44 @@ function atualizarStatusPill(){
 
 function toggleAberturaManual(){
   const cfg = getConfig(); const atualAberto = estaAberto();
-  if(cfg.manualAberto!==undefined) cfg.manualAberto=!cfg.manualAberto;
-  else cfg.manualAberto=!atualAberto;
-  localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
-  document.getElementById('cfg-manual-aberto').checked=(cfg.manualAberto===true);
+  // Se já tem override manual, inverte; senão, cria o override invertendo o estado automático
+  if(cfg.manualAberto !== undefined) cfg.manualAberto = !cfg.manualAberto;
+  else cfg.manualAberto = !atualAberto;
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+  const chk = document.getElementById('cfg-manual-aberto');
+  if(chk) chk.checked = true; // mantém marcado (override ativo)
   atualizarStatusPill(); atualizarManualStatus();
-  mostrarAlerta(cfg.manualAberto?'🟢 Restaurante ABERTO manualmente!':'🔴 Restaurante FECHADO manualmente!');
+  mostrarAlerta(cfg.manualAberto ? '🟢 Restaurante ABERTO manualmente!' : '🔴 Restaurante FECHADO manualmente!');
 }
 
 function atualizarManualStatus(){
   const cfg=getConfig(); const chk=document.getElementById('cfg-manual-aberto'); const txt=document.getElementById('manual-status-txt');
   if(!chk||!txt) return;
-  if(cfg.manualAberto===true){ chk.checked=true; txt.textContent='Aberto manualmente ✅'; txt.className='toggle-status aberto'; }
-  else if(cfg.manualAberto===false){ chk.checked=true; txt.textContent='Fechado manualmente 🔴'; txt.className='toggle-status fechado'; }
-  else{ chk.checked=false; txt.textContent='Usando horário automático'; txt.className='toggle-status'; }
+  if(cfg.manualAberto===true){
+    chk.checked=true; txt.textContent='✅ Aberto manualmente'; txt.className='toggle-status aberto';
+  } else if(cfg.manualAberto===false){
+    chk.checked=true; txt.textContent='🔴 Fechado manualmente'; txt.className='toggle-status fechado';
+  } else {
+    chk.checked=false; txt.textContent='Usando horário automático'; txt.className='toggle-status';
+  }
+}
+
+// Chamado quando o usuário clica no toggle manual pela primeira vez no checkbox
+function onManualCheckChange(chk){
+  const cfg=getConfig();
+  if(!chk.checked){
+    // Desmarcou → remove override, volta ao automático
+    delete cfg.manualAberto;
+    localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
+    atualizarStatusPill(); atualizarManualStatus();
+    mostrarAlerta('🕐 Voltando ao horário automático.');
+  } else {
+    // Marcou → ativa o override com o estado atual (aberto)
+    cfg.manualAberto = estaAberto();
+    localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
+    atualizarStatusPill(); atualizarManualStatus();
+    mostrarAlerta(cfg.manualAberto?'🟢 Restaurante ABERTO manualmente!':'🔴 Restaurante FECHADO manualmente!');
+  }
 }
 
 function testarHorario(){ mostrarAlerta(estaAberto()?'✅ Restaurante estaria ABERTO agora':'🔴 Restaurante estaria FECHADO agora'); }
@@ -1302,10 +1352,12 @@ function salvarConfig(){
   cfg.taxaPadrao=document.getElementById('cfg-taxa-padrao')?.checked||false;
   cfg.totalMesas=parseInt(document.getElementById('cfg-total-mesas')?.value)||10;
   const manualChk=document.getElementById('cfg-manual-aberto');
-  if(manualChk&&!manualChk.checked) delete cfg.manualAberto;
+  // Se o checkbox for desmarcado, remove o override manual (volta ao automático)
+  if(manualChk && !manualChk.checked) { delete cfg.manualAberto; }
+  // Se estiver marcado, mantém o valor existente (alterado por toggleAberturaManual)
   localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));
   const tn=document.getElementById('topbar-name'); if(tn) tn.textContent='Painel — '+(cfg.nome||'Garçom Digital');
-  atualizarStatusPill();
+  atualizarStatusPill(); atualizarManualStatus();
 }
 
 function carregarConfig(){
@@ -1334,13 +1386,67 @@ function getCardapio(){ try{ return JSON.parse(localStorage.getItem(CARDAPIO_KEY
 function saveCardapio(arr){ localStorage.setItem(CARDAPIO_KEY,JSON.stringify(arr)); }
 
 function renderCardapio(){
-  const items=getCardapio(); const gItems=items.filter(i=>i.cat==='garcom'||!i.cat); const cItems=items.filter(i=>i.cat==='cozinha');
-  const renderTabela=(list,tbodyId,tableId,emptyId)=>{ const tbody=document.getElementById(tbodyId); const table=document.getElementById(tableId); const empty=document.getElementById(emptyId); if(!list.length){ table.style.display='none'; empty.style.display='block'; } else { empty.style.display='none'; table.style.display='table'; tbody.innerHTML=list.map(i=>`<tr><td><strong>${i.cod}</strong></td><td>${i.desc}</td><td>${fmtBrl(i.valor)}</td><td><button class="btn-sm red" onclick="removerItem('${i.id}')">✕</button></td></tr>`).join(''); } };
-  renderTabela(gItems,'tbody-garcom','table-garcom','cardapio-empty-garcom');
-  renderTabela(cItems,'tbody-cozinha','table-cozinha','cardapio-empty-cozinha');
+  const items=getCardapio();
+  const gItems=items.filter(i=>i.cat==='garcom'||!i.cat);
+  const cItems=items.filter(i=>i.cat==='cozinha');
+
+  const renderTabela=(list,tbodyId,tableId,emptyId,selBarId,selAllId,indispCountId,cat)=>{
+    const tbody=document.getElementById(tbodyId);
+    const table=document.getElementById(tableId);
+    const empty=document.getElementById(emptyId);
+    const selBar=document.getElementById(selBarId);
+    const selAll=document.getElementById(selAllId);
+    const indispCount=document.getElementById(indispCountId);
+    if(!list.length){
+      table.style.display='none'; empty.style.display='block'; selBar.style.display='none';
+    } else {
+      empty.style.display='none'; table.style.display='table'; selBar.style.display='flex';
+      const totalIndisp=list.filter(i=>i.indisponivel).length;
+      if(totalIndisp>0){ indispCount.style.display='inline-block'; indispCount.textContent=totalIndisp+' indisponível(is)'; } else { indispCount.style.display='none'; }
+      // Selecionar tudo: marcado se todos disponíveis (nenhum indisponível)
+      selAll.checked = totalIndisp===0;
+      selAll.indeterminate = totalIndisp>0 && totalIndisp<list.length;
+      tbody.innerHTML=list.map(i=>{
+        const disp=!i.indisponivel;
+        return `<tr class="${disp?'':'indisponivel'}" data-id="${i.id}">
+          <td class="td-disp"><button class="btn-disp ${disp?'disponivel':'indisponivel'}" title="${disp?'Disponível — clique para ocultar':'Indisponível — clique para reativar'}" onclick="toggleDisponibilidade('${i.id}')">${disp?'✅':'🚫'}</button></td>
+          <td><strong>${i.cod}</strong></td>
+          <td>${i.desc}${!disp?'<span style="font-size:10px;color:var(--red-dark);font-weight:700;margin-left:6px;">(indisponível)</span>':''}</td>
+          <td>${fmtBrl(i.valor)}</td>
+          <td class="td-acoes"><button class="btn-sm red" onclick="removerItem('${i.id}')">🗑️</button></td>
+        </tr>`;
+      }).join('');
+    }
+  };
+
+  renderTabela(gItems,'tbody-garcom','table-garcom','cardapio-empty-garcom','sel-bar-garcom','sel-all-garcom','indisp-count-garcom','garcom');
+  renderTabela(cItems,'tbody-cozinha','table-cozinha','cardapio-empty-cozinha','sel-bar-cozinha','sel-all-cozinha','indisp-count-cozinha','cozinha');
+
   const arqUrl=localStorage.getItem(CARDAPIO_FILE_KEY); const arqNome=localStorage.getItem(CARDAPIO_FILE_NAME);
   const prevEl=document.getElementById('file-preview'); const areaEl=document.getElementById('upload-preview-area');
   if(arqUrl){ prevEl.style.display='flex'; document.getElementById('file-name').textContent=(arqNome||'Arquivo carregado')+' ✅'; if(arqUrl.startsWith('data:image')){ areaEl.style.display='block'; areaEl.innerHTML='<img src="'+arqUrl+'" style="width:100%;display:block;">'; } else { areaEl.style.display='block'; areaEl.innerHTML='<iframe src="'+arqUrl+'" style="width:100%;height:400px;border:none;display:block;"></iframe>'; } } else { prevEl.style.display='none'; areaEl.style.display='none'; }
+}
+
+function toggleDisponibilidade(id){
+  const items=getCardapio();
+  const item=items.find(i=>i.id===id);
+  if(!item) return;
+  item.indisponivel=!item.indisponivel;
+  saveCardapio(items);
+  renderCardapio();
+  mostrarAlerta(item.indisponivel?'🚫 Item marcado como indisponível!':'✅ Item reativado!');
+}
+
+function selecionarTodosDisp(cat, disponivel){
+  const items=getCardapio();
+  items.forEach(i=>{
+    if(cat==='garcom'?(i.cat==='garcom'||!i.cat):(i.cat===cat)){
+      i.indisponivel=!disponivel;
+    }
+  });
+  saveCardapio(items);
+  renderCardapio();
+  mostrarAlerta(disponivel?'✅ Todos os itens disponibilizados!':'🚫 Todos os itens marcados como indisponíveis!');
 }
 
 function adicionarItem(){ const cat=document.getElementById('new-cat').value; const cod=document.getElementById('new-cod').value.trim(); const desc=document.getElementById('new-desc').value.trim(); const valor=document.getElementById('new-valor').value; if(!cod||!desc||!valor){ mostrarAlerta('⚠️ Preencha código, descrição e valor!'); return; } const items=getCardapio(); items.push({id:Date.now().toString(),cat,cod,desc,valor:parseFloat(valor)}); saveCardapio(items); document.getElementById('new-cod').value=''; document.getElementById('new-desc').value=''; document.getElementById('new-valor').value=''; renderCardapio(); mostrarAlerta('✅ Item adicionado!'); }
@@ -1684,6 +1790,7 @@ async function confirmarPedido(){
     document.getElementById('ps-itens-text').textContent=itens.map(c=>c.qty+'x '+c.item.desc).join('\n')+(obs?(itens.length?'\n📝 ':'')+obs:'');
     document.getElementById('status-preparando').classList.add('show');
     document.getElementById('status-entregue').classList.remove('show');
+    document.getElementById('btn-cancelar-pedido').classList.add('show');
 
     mesaCarrinho={}; document.getElementById('obs-pedido').value=''; document.getElementById('busca-pedido').value='';
     mesaRenderItensPedido(mesaTodosItens); mesaRenderCarrinho(); mesaAtualizarBotao(); fecharConfirmacao(); fecharSection('pedido');
@@ -1696,16 +1803,35 @@ async function mesaVerificarStatus(){
   if(!mesaPedidoAtivoId) return;
   try{
     const lista=await mesaApiGet('chamados?id=eq.'+mesaPedidoAtivoId);
-    if(!lista.length){ mesaPedidoAtivoId=null; document.getElementById('status-preparando').classList.remove('show'); const el=document.getElementById('status-entregue'); el.classList.add('show'); mostrarToast('🎉 Pedido entregue! Bom apetite!','success'); setTimeout(()=>el.classList.remove('show'),8000); }
+    if(!lista.length){
+      mesaPedidoAtivoId=null;
+      document.getElementById('status-preparando').classList.remove('show');
+      document.getElementById('btn-cancelar-pedido').classList.remove('show');
+      const el=document.getElementById('status-entregue'); el.classList.add('show');
+      mostrarToast('🎉 Pedido entregue! Bom apetite!','success');
+      setTimeout(()=>el.classList.remove('show'),8000);
+    }
     mesaSetConexao('online');
   }catch(e){}
 }
 
+async function mesaCancelarPedido(){
+  if(!mesaPedidoAtivoId){ mostrarToast('⚠️ Nenhum pedido ativo.','error'); return; }
+  if(!confirm('Deseja cancelar seu pedido?')) return;
+  try{
+    await mesaApiDelete('chamados?id=eq.'+mesaPedidoAtivoId);
+    mesaPedidoAtivoId=null; mesaChamadoAtivoId=null;
+    document.getElementById('status-preparando').classList.remove('show');
+    document.getElementById('btn-cancelar-pedido').classList.remove('show');
+    mostrarToast('❌ Pedido cancelado.','cancel');
+  }catch(e){ mostrarToast('❌ Erro ao cancelar. Chame o garçom.','error'); }
+}
+
 async function mesaInit(){
-  mesaTodosItens=getCardapio(); mesaRenderItensPedido(mesaTodosItens);
+  mesaTodosItens=getCardapio().filter(i=>!i.indisponivel); mesaRenderItensPedido(mesaTodosItens);
   try{
     const lista=await mesaApiGet('chamados?mesa=eq.'+mesaNum+'&status=eq.pendente&order=created_at.desc&limit=1');
-    if(lista.length){ mesaChamadoAtivoId=lista[0].id; if(lista[0].tipo==='pedido'||lista[0].tipo==='pedido_garcom'){ mesaPedidoAtivoId=lista[0].id; document.getElementById('ps-itens-text').textContent=lista[0].obs||''; document.getElementById('status-preparando').classList.add('show'); } }
+    if(lista.length){ mesaChamadoAtivoId=lista[0].id; if(lista[0].tipo==='pedido'||lista[0].tipo==='pedido_garcom'){ mesaPedidoAtivoId=lista[0].id; document.getElementById('ps-itens-text').textContent=lista[0].obs||''; document.getElementById('status-preparando').classList.add('show'); document.getElementById('btn-cancelar-pedido').classList.add('show'); } }
     mesaSetConexao('online');
   }catch(e){ mesaSetConexao('offline'); }
 }

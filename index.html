@@ -296,10 +296,11 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
 
 .perigo-row{display:flex;gap:10px;flex-wrap:wrap;}
 
-#print-area{position:absolute;left:-9999px;top:0;width:80mm;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;}
+#print-area{position:fixed;left:-9999px;top:0;width:80mm;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;visibility:hidden;}
 @media print{
-  body>*:not(#print-area){display:none!important;}
-  #print-area{position:fixed!important;left:0!important;top:0!important;display:block!important;width:100%!important;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;}
+  *{visibility:hidden!important;}
+  #print-area,#print-area *{visibility:visible!important;}
+  #print-area{position:fixed!important;left:0!important;top:0!important;width:100%!important;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;}
   @page{margin:0;size:80mm auto;}
 }
 .print-ticket{font-family:'Courier New',monospace;font-size:13px;line-height:1.6;color:black;}
@@ -477,7 +478,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
     </div>
   </div>
   <div class="topbar-right">
-    <button class="status-pill fechado" id="status-pill-btn" onclick="toggleAberturaManual()" title="Clique para abrir/fechar manualmente"></button>
+    <button class="status-pill fechado" id="status-pill-btn" onclick="toggleAberturaManual()" title="Clique para abrir/fechar manualmente"><span class="dot"></span>Carregando...</button>
     <div class="live-dot offline" id="live-dot"><span></span><span id="live-txt">Conectando...</span></div>
     <div class="clock" id="clock">00:00:00</div>
   </div>
@@ -1533,6 +1534,8 @@ function showPage(id,btn){
 // ====================================================
 async function inicializarPainel(){
   carregarConfig();
+  atualizarStatusPill();
+  atualizarManualStatus();
   await carregarSessoes();
   renderMesasSessoes();
   renderizar();
@@ -1648,7 +1651,10 @@ async function mesaVerificarSessao(){
 
 async function inicializarMesa(){
   mesaNum = urlParams.get('mesa')||'1';
-  const nomeRest = urlParams.get('nome')||'Restaurante';
+  // Nome: prioridade URL param → config salvo no localStorage → fallback
+  const nomeUrl = urlParams.get('nome');
+  const cfg = getConfig();
+  const nomeRest = (nomeUrl && nomeUrl !== 'Restaurante') ? nomeUrl : (cfg.nome || nomeUrl || 'Restaurante');
   const tokenUrl = urlParams.get('token')||null;
   document.getElementById('mesa-display').textContent = mesaNum;
   document.getElementById('restaurant-name').textContent = nomeRest;
@@ -1657,7 +1663,7 @@ async function inicializarMesa(){
   // Verifica horário
   verificarAbertura();
 
-  mesaTodosItens = getCardapio();
+  mesaTodosItens = getCardapio().filter(i=>!i.indisponivel);
   mesaRenderItensPedido(mesaTodosItens);
   document.getElementById('obs-pedido').addEventListener('input', mesaAtualizarBotao);
 
@@ -1838,10 +1844,17 @@ async function mesaInit(){
 
 function mesaRenderCardapioDownload(){
   const cont=document.getElementById('dl-content'); cont.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;">⏳ Carregando...</div>';
-  const arquivoRaw=localStorage.getItem(CARDAPIO_FILE_KEY); const arquivoNome=localStorage.getItem(CARDAPIO_FILE_NAME)||'Cardápio'; const items=getCardapio();
+  const arquivoRaw=localStorage.getItem(CARDAPIO_FILE_KEY); const arquivoNome=localStorage.getItem(CARDAPIO_FILE_NAME)||'Cardápio';
+  // Apenas itens disponíveis para o cliente
+  const allItems=getCardapio(); const items=allItems.filter(i=>!i.indisponivel);
+  const gItems=items.filter(i=>i.cat==='garcom'||!i.cat); const cItems=items.filter(i=>i.cat==='cozinha');
   let html='';
   if(arquivoRaw){ const isPdf=arquivoRaw.startsWith('data:application/pdf')||arquivoRaw.toLowerCase().includes('.pdf')||(arquivoNome&&arquivoNome.toLowerCase().endsWith('.pdf')); html+='<div style="margin-bottom:14px"><div class="arquivo-header-lbl">📄 '+arquivoNome+'</div><div class="arquivo-inline">'+(isPdf?'<iframe src="'+arquivoRaw+'" style="width:100%;height:480px;border:none;display:block;"></iframe>':'<img src="'+arquivoRaw+'" alt="Cardápio" loading="lazy" style="width:100%;display:block;">')+'</div></div>'; }
-  if(items.length){ html+='<div class="arquivo-header-lbl" style="margin-top:'+(arquivoRaw?'8px':'0')+'">📋 Itens do Cardápio</div><div class="cardapio-lista-view">'+items.map(i=>'<div class="cardapio-view-item"><span class="cvi-cod">'+i.cod+'</span><span class="cvi-desc">'+i.desc+'</span><span class="cvi-val">R$'+parseFloat(i.valor).toFixed(2)+'</span></div>').join('')+'</div>'; }
+  if(items.length){
+    html+='<div class="arquivo-header-lbl" style="margin-top:'+(arquivoRaw?'8px':'0')+'">📋 Itens do Cardápio</div>';
+    if(gItems.length){ html+='<div style="font-size:11px;font-weight:900;color:var(--orange-dark);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 4px;padding:4px 8px;background:var(--orange-light);border-radius:6px;">🟠 Garçom — Bebidas & Extras</div><div class="cardapio-lista-view">'+gItems.map(i=>'<div class="cardapio-view-item"><span class="cvi-cod">'+i.cod+'</span><span class="cvi-desc">'+i.desc+'</span><span class="cvi-val">R$'+parseFloat(i.valor).toFixed(2)+'</span></div>').join('')+'</div>'; }
+    if(cItems.length){ html+='<div style="font-size:11px;font-weight:900;color:var(--teal-dark);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 4px;padding:4px 8px;background:var(--teal-light);border-radius:6px;">🟢 Cozinha — Pratos & Refeições</div><div class="cardapio-lista-view">'+cItems.map(i=>'<div class="cardapio-view-item"><span class="cvi-cod">'+i.cod+'</span><span class="cvi-desc">'+i.desc+'</span><span class="cvi-val">R$'+parseFloat(i.valor).toFixed(2)+'</span></div>').join('')+'</div>'; }
+  }
   if(!arquivoRaw&&!items.length){ html='<div class="vazio-msg"><div class="vazio-icon">📭</div><div class="vazio-texto">Cardápio ainda não disponível.<br>Consulte o garçom.</div></div>'; }
   cont.innerHTML=html;
 }

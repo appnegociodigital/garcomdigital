@@ -12,6 +12,7 @@
     --blue:#3B82F6;--blue-dark:#2563EB;--blue-light:#EFF6FF;
     --purple:#8B5CF6;--purple-light:#F5F3FF;
     --red:#EF4444;--red-dark:#DC2626;--red-light:#FEF2F2;
+    --teal:#14B8A6;--teal-light:#F0FDFA;--teal-dark:#0F766E;
     --bg:#F0EDE8;--card:#FFFFFF;--text:#1A1A2E;--gray:#6B7280;--border:#E5E7EB;
     --shadow:0 2px 12px rgba(0,0,0,0.08);
   }
@@ -33,8 +34,8 @@
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
   .clock{font-size:16px;font-weight:700;color:white;}
 
-  .nav-tabs{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0;}
-  .nav-tab{padding:14px 20px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--gray);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all 0.2s;margin-bottom:-2px;}
+  .nav-tabs{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
+  .nav-tab{padding:14px 20px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--gray);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all 0.2s;margin-bottom:-2px;white-space:nowrap;}
   .nav-tab:hover{color:var(--text);}
   .nav-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
 
@@ -54,16 +55,16 @@
   .btn.orange{background:var(--orange);color:white;}
   .btn.blue{background:var(--blue);color:white;}
   .btn.green{background:var(--green);color:white;}
+  .btn.teal{background:var(--teal);color:white;}
   .btn.red{background:var(--red-light);color:var(--red);border:2px solid var(--red);}
   .btn.red:hover{background:var(--red);color:white;}
 
-  /* STATUS SUPABASE */
   .supabase-status{background:var(--blue-light);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:10px 16px;margin:0;font-size:13px;font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:8px;}
   .supabase-status.ok{background:var(--green-light);border-left-color:var(--green);color:var(--green-dark);}
   .supabase-status.erro{background:var(--red-light);border-left-color:var(--red);color:var(--red-dark);}
 
   .stats{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-  .stat{background:var(--card);border-radius:12px;padding:14px 18px;min-width:130px;box-shadow:var(--shadow);border-left:4px solid transparent;flex:1;}
+  .stat{background:var(--card);border-radius:12px;padding:14px 18px;min-width:110px;box-shadow:var(--shadow);border-left:4px solid transparent;flex:1;}
   .stat.orange{border-left-color:var(--orange);}
   .stat.green{border-left-color:var(--green);}
   .stat.blue{border-left-color:var(--blue);}
@@ -71,43 +72,60 @@
   .stat-num{font-size:28px;font-weight:900;color:var(--text);line-height:1;margin-bottom:3px;}
   .stat-label{font-size:12px;color:var(--gray);font-weight:600;}
 
-  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
   .section-title{font-size:16px;font-weight:900;color:var(--text);}
   .section-sub{font-size:12px;color:var(--gray);font-weight:600;margin-top:2px;}
 
-  .chamados-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+  /* CHAMADOS LAYOUT POR LINHA */
+  .chamados-lista{display:flex;flex-direction:column;gap:10px;}
 
-  .chamado-card{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--shadow);border:2px solid transparent;transition:transform 0.15s;animation:slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
-  @keyframes slideIn{from{opacity:0;transform:translateY(-12px) scale(0.97);}to{opacity:1;transform:none;}}
-  .chamado-card:hover{transform:translateY(-2px);}
-  .chamado-card.garcom{border-color:var(--orange);background:linear-gradient(135deg,white 60%,var(--orange-light));}
-  .chamado-card.conta{border-color:var(--green);background:linear-gradient(135deg,white 60%,var(--green-light));}
-  .chamado-card.pedido{border-color:var(--blue);background:linear-gradient(135deg,white 60%,var(--blue-light));}
-  .chamado-card.urgente{border-color:var(--red)!important;animation:urgente 0.8s ease infinite alternate;}
+  .chamado-card{background:var(--card);border-radius:14px;padding:14px 18px;box-shadow:var(--shadow);border-left:5px solid transparent;transition:transform 0.15s;animation:slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+  .chamado-card:hover{transform:translateX(3px);}
+  .chamado-card.garcom{border-left-color:var(--orange);}
+  .chamado-card.cozinha{border-left-color:var(--teal);}
+  .chamado-card.conta{border-left-color:var(--green);}
+  .chamado-card.garcom-call{border-left-color:var(--orange);}
+  .chamado-card.urgente{animation:urgente 0.8s ease infinite alternate;}
   @keyframes urgente{from{box-shadow:0 0 0 0 rgba(239,68,68,0.3);}to{box-shadow:0 0 0 8px rgba(239,68,68,0);}}
 
-  .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .mesa-big{font-size:38px;font-weight:900;color:var(--text);line-height:1;}
-  .mesa-lbl{font-size:11px;color:var(--gray);font-weight:600;}
-  .tipo-badge{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
-  .tipo-emoji{font-size:30px;}
-  .tipo-label{font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px;}
-  .garcom .tipo-label{background:var(--orange-light);color:var(--orange-dark);}
-  .conta .tipo-label{background:var(--green-light);color:var(--green-dark);}
-  .pedido .tipo-label{background:var(--blue-light);color:var(--blue-dark);}
+  .card-mesa-col{text-align:center;min-width:56px;}
+  .mesa-big{font-size:30px;font-weight:900;color:var(--text);line-height:1;}
+  .mesa-lbl{font-size:10px;color:var(--gray);font-weight:700;text-transform:uppercase;}
 
-  .card-obs{font-size:12px;font-weight:600;color:var(--text);background:rgba(0,0,0,0.04);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-style:italic;word-break:break-word;}
+  .card-body-col{flex:1;}
+  .card-tipo-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .tipo-badge-linha{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:12px;font-weight:700;}
+  .tipo-badge-linha.garcom{background:var(--orange-light);color:var(--orange-dark);}
+  .tipo-badge-linha.cozinha{background:var(--teal-light);color:var(--teal-dark);}
+  .tipo-badge-linha.conta{background:var(--green-light);color:var(--green-dark);}
+  .tipo-badge-linha.garcom-call{background:var(--orange-light);color:var(--orange-dark);}
 
-  .card-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .hora-chamado{font-size:12px;color:var(--gray);font-weight:600;}
-  .tempo-decorrido{font-size:20px;font-weight:900;color:var(--text);text-align:right;}
-  .tempo-lbl{font-size:10px;color:var(--gray);font-weight:600;text-align:right;}
+  .card-itens{font-size:12px;font-weight:600;color:var(--text);line-height:1.7;}
+  .card-item-linha{display:flex;align-items:baseline;gap:6px;padding:2px 0;border-bottom:1px dashed var(--border);}
+  .card-item-linha:last-child{border-bottom:none;}
+  .item-cat-tag{font-size:10px;font-weight:900;padding:1px 6px;border-radius:4px;flex-shrink:0;}
+  .item-cat-tag.g{background:var(--orange-light);color:var(--orange-dark);}
+  .item-cat-tag.c{background:var(--teal-light);color:var(--teal-dark);}
+  .item-qty{font-weight:900;color:var(--text);}
+  .item-nome{flex:1;}
+  .item-preco{font-weight:700;color:var(--green-dark);font-size:11px;white-space:nowrap;}
 
-  .btn-atender{width:100%;padding:12px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;color:white;transition:filter 0.2s;}
-  .btn-atender:hover{filter:brightness(0.9);}
-  .garcom .btn-atender{background:var(--orange);}
-  .conta .btn-atender{background:var(--green);}
-  .pedido .btn-atender{background:var(--blue);}
+  .card-obs{font-size:11px;color:var(--gray);font-style:italic;margin-top:4px;}
+
+  .card-tempo-col{text-align:right;min-width:60px;}
+  .tempo-decorrido{font-size:18px;font-weight:900;color:var(--text);}
+  .tempo-lbl{font-size:10px;color:var(--gray);font-weight:600;}
+  .hora-chamado{font-size:11px;color:var(--gray);font-weight:600;margin-top:2px;}
+
+  .card-acoes-col{display:flex;flex-direction:column;gap:6px;min-width:130px;}
+  .btn-atender{padding:9px 14px;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:white;transition:filter 0.2s;white-space:nowrap;}
+  .btn-atender:hover{filter:brightness(0.88);}
+  .btn-atender.orange{background:var(--orange);}
+  .btn-atender.green{background:var(--green);}
+  .btn-atender.teal{background:var(--teal);}
+  .btn-print-pedido{padding:7px 14px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white;color:var(--gray);white-space:nowrap;}
+  .btn-print-pedido:hover{background:var(--bg);}
 
   .empty-state{text-align:center;padding:50px 20px;color:var(--gray);display:none;}
   .empty-state.show{display:block;}
@@ -118,7 +136,11 @@
   .history-list{display:flex;flex-direction:column;gap:7px;}
   .history-item{background:var(--card);border-radius:10px;padding:11px 14px;display:flex;align-items:flex-start;justify-content:space-between;font-size:13px;font-weight:600;color:var(--gray);box-shadow:0 1px 6px rgba(0,0,0,0.05);gap:10px;}
   .history-item .mesa{color:var(--text);font-weight:700;}
-  .history-obs{font-size:11px;color:var(--gray);margin-top:2px;font-style:italic;}
+
+  /* CARDÁPIO COM CATEGORIAS */
+  .cat-header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin:10px 0 6px;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;}
+  .cat-header.garcom{background:var(--orange-light);color:var(--orange-dark);}
+  .cat-header.cozinha{background:var(--teal-light);color:var(--teal-dark);}
 
   .cardapio-table{width:100%;border-collapse:collapse;}
   .cardapio-table th{text-align:left;padding:10px 12px;font-size:12px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);}
@@ -132,6 +154,8 @@
   .add-item-form{background:var(--bg);border-radius:12px;padding:14px;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
   .add-item-form .form-group{display:flex;flex-direction:column;gap:4px;}
   .add-item-form label{font-size:12px;font-weight:700;color:var(--gray);}
+  .cat-select{border:2px solid var(--border);border-radius:10px;padding:9px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:var(--text);outline:none;background:white;cursor:pointer;}
+  .cat-select:focus{border-color:var(--orange);}
 
   .upload-area{border:2px dashed var(--purple);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:background 0.2s;margin-top:12px;}
   .upload-area:hover{background:var(--purple-light);}
@@ -141,9 +165,10 @@
   .file-preview{background:var(--purple-light);border:2px solid #DDD6FE;border-radius:10px;padding:12px 16px;margin-top:10px;display:flex;align-items:center;justify-content:space-between;}
   .file-preview-name{font-size:13px;font-weight:700;color:#5B21B6;}
 
+  /* MODAL */
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:20px;}
   .modal-overlay.show{display:flex;}
-  .modal{background:white;border-radius:20px;padding:28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+  .modal{background:white;border-radius:20px;padding:28px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);max-height:90vh;overflow-y:auto;}
   @keyframes modalIn{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
   .modal h3{font-size:20px;font-weight:900;margin-bottom:6px;}
   .modal p{font-size:13px;color:var(--gray);font-weight:600;margin-bottom:16px;}
@@ -155,16 +180,59 @@
   .qr-etiqueta-sub{color:rgba(255,255,255,0.6);font-size:11px;font-weight:600;margin-top:4px;}
 
   .link-box{background:var(--bg);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gray);font-weight:600;word-break:break-all;margin-bottom:12px;text-align:left;}
-  .modal-btns{display:flex;gap:8px;}
-  .btn-fechar{flex:1;padding:11px;border:2px solid var(--border);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--gray);}
-  .btn-copiar{flex:1;padding:11px;border:none;border-radius:10px;background:var(--orange);color:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+  .modal-btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-fechar{flex:1;min-width:100px;padding:11px;border:2px solid var(--border);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--gray);}
+  .btn-copiar{flex:1;min-width:100px;padding:11px;border:none;border-radius:10px;background:var(--orange);color:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+
+  /* MODAL CONTA */
+  .conta-modal{max-width:480px;}
+  .conta-mesa-header{background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;}
+  .conta-mesa-num{font-size:36px;font-weight:900;}
+  .conta-mesa-lbl{font-size:13px;opacity:0.85;font-weight:600;}
+  .conta-secao{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px;text-align:left;}
+  .conta-secao-titulo{font-size:12px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .conta-item-linha{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px;}
+  .conta-item-linha:last-child{border-bottom:none;}
+  .conta-item-nome{flex:1;font-weight:600;color:var(--text);}
+  .conta-item-qty{font-size:12px;color:var(--gray);font-weight:600;margin:0 8px;white-space:nowrap;}
+  .conta-item-sub{font-weight:700;color:var(--text);white-space:nowrap;}
+  .conta-subtotal{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:8px 0;border-top:2px solid var(--border);margin-top:4px;}
+  .conta-taxa-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:white;border-radius:10px;margin-bottom:12px;border:2px solid var(--border);}
+  .conta-taxa-check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;cursor:pointer;}
+  .conta-taxa-check input{width:18px;height:18px;cursor:pointer;}
+  .conta-taxa-val{font-size:14px;font-weight:900;color:var(--green-dark);}
+  .conta-total-box{background:linear-gradient(135deg,var(--green-light),white);border:2px solid var(--green);border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;}
+  .conta-total-lbl{font-size:12px;font-weight:700;color:var(--green-dark);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+  .conta-total-val{font-size:36px;font-weight:900;color:var(--green-dark);}
+  .conta-aviso{font-size:11px;color:var(--gray);font-weight:600;margin-top:4px;}
+  .conta-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+  .btn-conta-imprimir{padding:12px;border:2px solid var(--border);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--text);}
+  .btn-conta-finalizar{padding:12px;border:none;border-radius:10px;background:var(--green);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;}
+  .btn-conta-fechar{grid-column:1/-1;padding:10px;border:2px solid var(--border);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--gray);}
 
   .alert-banner{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--orange);color:white;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:900;z-index:150;box-shadow:0 8px 32px rgba(255,107,53,0.4);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;text-align:center;max-width:90%;}
   .alert-banner.show{transform:translateX(-50%) translateY(0);}
+
+  /* IMPRESSÃO TÉRMICA */
+  @media print{
+    body *{visibility:hidden;}
+    #print-area, #print-area *{visibility:visible;}
+    #print-area{position:fixed;left:0;top:0;width:80mm;font-family:'Courier New',monospace;font-size:12px;color:black;background:white;padding:4mm;}
+    @page{margin:0;size:80mm auto;}
+  }
+  #print-area{display:none;}
+
+  .print-ticket{font-family:'Courier New',monospace;font-size:13px;line-height:1.6;color:black;}
+  .print-ticket .pt-center{text-align:center;}
+  .print-ticket .pt-line{border-top:1px dashed #000;margin:6px 0;}
+  .print-ticket .pt-bold{font-weight:bold;}
+  .print-ticket .pt-row{display:flex;justify-content:space-between;}
+  .print-ticket .pt-total{font-size:16px;font-weight:bold;}
 </style>
 </head>
 <body>
 
+<div id="print-area"></div>
 <div class="alert-banner" id="alert-banner"></div>
 
 <div class="topbar">
@@ -190,7 +258,7 @@
   <button class="nav-tab" onclick="showPage('config',this)">⚙️ Config</button>
 </div>
 
-<!-- CHAMADOS -->
+<!-- ============ CHAMADOS ============ -->
 <div class="page active" id="page-chamados">
   <div class="stats">
     <div class="stat orange"><div class="stat-num" id="stat-pendentes">0</div><div class="stat-label">Pendentes</div></div>
@@ -201,7 +269,7 @@
   <div class="section-header">
     <div>
       <div class="section-title">📋 Chamados em Aberto</div>
-      <div class="section-sub">Clique em "Atendido" para concluir</div>
+      <div class="section-sub">Pedidos separados por categoria • Garçom 🟠 | Cozinha 🟢</div>
     </div>
     <button class="btn red" onclick="limparTudo()">🗑️ Limpar Tudo</button>
   </div>
@@ -210,14 +278,14 @@
     <div class="empty-title">Tudo tranquilo!</div>
     <div class="empty-sub">Nenhum chamado pendente.</div>
   </div>
-  <div class="chamados-grid" id="chamados-grid"></div>
+  <div class="chamados-lista" id="chamados-lista"></div>
   <div id="history-section" style="display:none;margin-top:28px;">
     <div class="section-title" style="margin-bottom:12px">📜 Histórico de Hoje</div>
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
-<!-- CARDÁPIO -->
+<!-- ============ CARDÁPIO ============ -->
 <div class="page" id="page-cardapio">
   <div class="settings-row">
     <div class="settings-row-title">📤 Upload do Cardápio (PDF ou Imagem)</div>
@@ -232,17 +300,36 @@
       <span class="file-preview-name" id="file-name">—</span>
       <button class="btn-sm red" onclick="removerArquivo()">✕ Remover</button>
     </div>
-    <!-- Pré-visualização inline do arquivo carregado -->
     <div id="upload-preview-area" style="display:none;margin-top:12px;border-radius:12px;overflow:hidden;border:2px solid #DDD6FE;"></div>
   </div>
+
   <div class="settings-row">
     <div class="settings-row-title">📋 Itens do Cardápio Digital</div>
-    <div id="cardapio-empty-msg" style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado ainda.</div>
-    <table class="cardapio-table" id="cardapio-table" style="display:none">
-      <thead><tr><th>Código</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
-      <tbody id="cardapio-tbody"></tbody>
+
+    <!-- Garçom -->
+    <div class="cat-header garcom">🟠 Garçom — Bebidas & Extras</div>
+    <div id="cardapio-empty-garcom" style="padding:10px 12px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado.</div>
+    <table class="cardapio-table" id="table-garcom" style="display:none">
+      <thead><tr><th>Cód.</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <tbody id="tbody-garcom"></tbody>
     </table>
+
+    <!-- Cozinha -->
+    <div class="cat-header cozinha" style="margin-top:16px;">🟢 Cozinha — Pratos & Refeições</div>
+    <div id="cardapio-empty-cozinha" style="padding:10px 12px;color:var(--gray);font-size:13px;font-weight:600;">Nenhum item cadastrado.</div>
+    <table class="cardapio-table" id="table-cozinha" style="display:none">
+      <thead><tr><th>Cód.</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <tbody id="tbody-cozinha"></tbody>
+    </table>
+
     <div class="add-item-form">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select class="cat-select" id="new-cat">
+          <option value="garcom">🟠 Garçom</option>
+          <option value="cozinha">🟢 Cozinha</option>
+        </select>
+      </div>
       <div class="form-group">
         <label>Código</label>
         <input class="form-input" type="text" id="new-cod" placeholder="001" style="width:80px" maxlength="10">
@@ -260,7 +347,7 @@
   </div>
 </div>
 
-<!-- QR CODES -->
+<!-- ============ QR CODES ============ -->
 <div class="page" id="page-qrcodes">
   <div class="settings-row">
     <div class="settings-row-title">📱 Gerar QR Code por Mesa</div>
@@ -287,7 +374,7 @@
   </div>
 </div>
 
-<!-- CONFIG -->
+<!-- ============ CONFIG ============ -->
 <div class="page" id="page-config">
   <div class="settings-row">
     <div class="settings-row-title">🏪 Nome do Restaurante</div>
@@ -300,6 +387,14 @@
     <input class="form-input" style="width:100%" type="text" id="cfg-msg-qr" value="📱 Escaneie para Chamar o Garçom / Fazer Pedido" oninput="salvarConfig()">
   </div>
   <div class="settings-row">
+    <div class="settings-row-title">💳 Taxa de Serviço (Garçom)</div>
+    <div class="form-row">
+      <label style="font-size:14px;font-weight:700;">Taxa padrão pré-fixada:</label>
+      <span style="font-size:18px;font-weight:900;color:var(--green-dark);">10%</span>
+      <span style="font-size:13px;color:var(--gray);font-weight:600;">(aparece como opção na conta — o operador decide aplicar ou não)</span>
+    </div>
+  </div>
+  <div class="settings-row">
     <div class="settings-row-title">🔴 Zona de Perigo</div>
     <div class="form-row">
       <button class="btn red" onclick="limparHistoricoLocal()">🗑️ Limpar Histórico</button>
@@ -309,7 +404,7 @@
   </div>
 </div>
 
-<!-- MODAL QR -->
+<!-- ============ MODAL QR ============ -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h3>📱 QR Code — Mesa <span id="qr-mesa-num"></span></h3>
@@ -328,6 +423,64 @@
   </div>
 </div>
 
+<!-- ============ MODAL CONTA ============ -->
+<div class="modal-overlay" id="modal-conta">
+  <div class="modal conta-modal">
+    <h3>💳 Fechamento de Conta</h3>
+    <div class="conta-mesa-header">
+      <div class="conta-mesa-num" id="conta-mesa-num">—</div>
+      <div class="conta-mesa-lbl">Mesa</div>
+    </div>
+
+    <!-- Itens Garçom -->
+    <div class="conta-secao" id="conta-sec-garcom" style="display:none">
+      <div class="conta-secao-titulo">🟠 Garçom — Bebidas & Extras</div>
+      <div id="conta-itens-garcom"></div>
+      <div class="conta-subtotal">
+        <span>Subtotal Garçom</span>
+        <span id="conta-sub-garcom">R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Itens Cozinha -->
+    <div class="conta-secao" id="conta-sec-cozinha" style="display:none">
+      <div class="conta-secao-titulo">🟢 Cozinha — Pratos & Refeições</div>
+      <div id="conta-itens-cozinha"></div>
+      <div class="conta-subtotal">
+        <span>Subtotal Cozinha</span>
+        <span id="conta-sub-cozinha">R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Sem pedidos -->
+    <div id="conta-sem-pedidos" style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;display:none;">
+      ℹ️ Nenhum pedido registrado nesta mesa. Conta zerada.
+    </div>
+
+    <!-- Taxa 10% -->
+    <div class="conta-taxa-row">
+      <label class="conta-taxa-check">
+        <input type="checkbox" id="taxa-check" onchange="recalcularConta()">
+        Taxa de Serviço (10% Garçom)
+      </label>
+      <span class="conta-taxa-val" id="taxa-valor">R$ 0,00</span>
+    </div>
+
+    <!-- Total -->
+    <div class="conta-total-box">
+      <div class="conta-total-lbl">Total a Pagar</div>
+      <div class="conta-total-val" id="conta-total">R$ 0,00</div>
+      <div class="conta-aviso" id="conta-aviso"></div>
+    </div>
+
+    <div class="conta-btns">
+      <button class="btn-conta-imprimir" onclick="imprimirConta()">🖨️ Imprimir Conta</button>
+      <button class="btn-conta-finalizar" onclick="finalizarConta()">✅ Finalizar & Limpar Mesa</button>
+      <button class="btn-conta-fechar" onclick="fecharModalConta()">← Voltar sem finalizar</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 // ========== SUPABASE CONFIG ==========
@@ -335,63 +488,77 @@ const SUPABASE_URL = 'https://mgqwhjjqkhrivgogwtdf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ncXdoampxa2hyaXZnb2d3dGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MDg2MDMsImV4cCI6MjA5Mzk4NDYwM30.OOt4zd1fTeogLm848KNW7a09pxDL1BMsJWYWrGI6s5I';
 const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 
-const CARDAPIO_KEY='restaurante_cardapio';
-const CARDAPIO_FILE_KEY='restaurante_cardapio_arquivo';
-const CARDAPIO_FILE_NAME='restaurante_cardapio_nome';
-const CONFIG_KEY='restaurante_config';
-const HISTORY_KEY='restaurante_historico';
+const CARDAPIO_KEY   = 'restaurante_cardapio';
+const CARDAPIO_FILE_KEY = 'restaurante_cardapio_arquivo';
+const CARDAPIO_FILE_NAME= 'restaurante_cardapio_nome';
+const CONFIG_KEY     = 'restaurante_config';
+const HISTORY_KEY    = 'restaurante_historico';
+// Acumula pedidos por mesa para cálculo da conta
+const PEDIDOS_MESA_KEY = 'restaurante_pedidos_mesa'; // { [mesa]: [{itens,timestamp}] }
 
-let atendidosHoje=0;
-let chamadosAnteriores=new Set();
-let qrLinkAtual='';
-let online=false;
+let atendidosHoje = 0;
+let chamadosAnteriores = new Set();
+let qrLinkAtual = '';
+let online = false;
+
+// Estado da conta em aberto
+let contaMesaAtual = null;
+let contaSubtotalPuro = 0;
 
 // ========== API ==========
 async function apiGet(path){
-  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:HEADERS});
-  if(!r.ok)throw new Error(await r.text());
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {headers:HEADERS});
+  if(!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function apiDelete(path){
-  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{method:'DELETE',headers:HEADERS});
-  if(!r.ok)throw new Error(await r.text());
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {method:'DELETE',headers:HEADERS});
+  if(!r.ok) throw new Error(await r.text());
 }
 
 // ========== STATUS ==========
 function setOnline(ok){
-  online=ok;
-  const dot=document.getElementById('live-dot');
-  const txt=document.getElementById('live-txt');
-  const status=document.getElementById('supabase-status');
+  online = ok;
+  const dot = document.getElementById('live-dot');
+  const txt = document.getElementById('live-txt');
+  const status = document.getElementById('supabase-status');
   if(ok){
-    dot.className='live-dot online';txt.textContent='AO VIVO';
+    dot.className='live-dot online'; txt.textContent='AO VIVO';
     status.className='supabase-status ok';
     status.textContent='✅ Conectado ao Supabase — atualizações em tempo real';
   } else {
-    dot.className='live-dot offline';txt.textContent='Desconectado';
+    dot.className='live-dot offline'; txt.textContent='Desconectado';
     status.className='supabase-status erro';
     status.textContent='❌ Erro de conexão — tentando reconectar...';
   }
 }
 
-// ========== CLOCK ==========
 setInterval(()=>{
-  document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
 
 // ========== HELPERS ==========
 function tempoDecorrido(ts){
-  const d=Math.floor((Date.now()-ts)/1000);
+  const d = Math.floor((Date.now()-ts)/1000);
   return `${String(Math.floor(d/60)).padStart(2,'0')}:${String(d%60).padStart(2,'0')}`;
 }
+function fmtBrl(v){ return 'R$ '+parseFloat(v).toFixed(2).replace('.',','); }
+
 function getTipoInfo(tipo){
-  return {garcom:{emoji:'🔔',label:'Garçom',classe:'garcom'},conta:{emoji:'💳',label:'Conta',classe:'conta'},pedido:{emoji:'🍽️',label:'Pedido',classe:'pedido'}}[tipo]||{emoji:'🔔',label:'Garçom',classe:'garcom'};
+  const map = {
+    garcom:     {emoji:'🔔',label:'Garçom',classe:'garcom-call'},
+    conta:      {emoji:'💳',label:'Conta',classe:'conta'},
+    pedido:     {emoji:'🍽️',label:'Pedido',classe:'garcom'},
+    pedido_garcom: {emoji:'🟠',label:'Garçom',classe:'garcom'},
+    pedido_cozinha:{emoji:'🟢',label:'Cozinha',classe:'cozinha'},
+  };
+  return map[tipo] || {emoji:'🔔',label:'Garçom',classe:'garcom-call'};
 }
 
 // ========== SOM ==========
 function tocarSom(){
   try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const ctx = new(window.AudioContext||window.webkitAudioContext)();
     [880,1100].forEach((f,i)=>{
       const o=ctx.createOscillator(),g=ctx.createGain();
       o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
@@ -403,188 +570,484 @@ function tocarSom(){
 }
 
 function mostrarAlerta(txt){
-  const b=document.getElementById('alert-banner');
-  b.textContent=txt;b.classList.add('show');
+  const b = document.getElementById('alert-banner');
+  b.textContent=txt; b.classList.add('show');
   setTimeout(()=>b.classList.remove('show'),3500);
+}
+
+// ========== PEDIDOS POR MESA (acumulador para conta) ==========
+function getPedidosMesa(){
+  try{ return JSON.parse(localStorage.getItem(PEDIDOS_MESA_KEY)||'{}'); }catch{ return {}; }
+}
+function setPedidosMesa(obj){ localStorage.setItem(PEDIDOS_MESA_KEY, JSON.stringify(obj)); }
+
+// Registra pedido quando aparece como novo chamado
+function registrarPedidoNaMesa(chamado){
+  if(chamado.tipo !== 'pedido_garcom' && chamado.tipo !== 'pedido_cozinha' && chamado.tipo !== 'pedido') return;
+  const acc = getPedidosMesa();
+  if(!acc[chamado.mesa]) acc[chamado.mesa] = [];
+  // Evita duplicar
+  if(acc[chamado.mesa].some(p=>p.chamado_id===chamado.id)) return;
+
+  const itens = parseItensChamado(chamado.obs || '');
+  acc[chamado.mesa].push({
+    chamado_id: chamado.id,
+    tipo: chamado.tipo,
+    itens,
+    obs_livre: chamado.obs_livre || '',
+    hora: chamado.hora
+  });
+  setPedidosMesa(acc);
+}
+
+// Parse da string de obs do chamado
+function parseItensChamado(obsStr){
+  // Formato esperado: "2x 001 Cerveja|1x 005 Frango Grelhado|obs:sem sal"
+  const partes = obsStr.split('|');
+  const itens = [];
+  for(const p of partes){
+    if(p.startsWith('obs:')) continue;
+    const m = p.trim().match(/^(\d+)x\s+(\S+)\s+(.+?)\s+R\$([\d.,]+)$/);
+    if(m){
+      itens.push({qty:parseInt(m[1]),cod:m[2],desc:m[3],valor:parseFloat(m[4].replace(',','.'))});
+    } else if(p.trim()){
+      // fallback: só texto
+      itens.push({qty:1,cod:'',desc:p.trim(),valor:0});
+    }
+  }
+  return itens;
 }
 
 // ========== ATENDER ==========
 async function atender(id, mesa, tipo){
-  try {
+  try{
     await apiDelete(`chamados?id=eq.${id}`);
-    // Salva histórico local
-    const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
     hist.unshift({id,mesa,tipo,label:getTipoInfo(tipo).label,horaAtendido:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
-    if(hist.length>30)hist.length=30;
+    if(hist.length>30) hist.length=30;
     localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));
     atendidosHoje++;
     renderizar();
-  } catch(e){mostrarAlerta('❌ Erro ao atender chamado.');}
+  }catch(e){ mostrarAlerta('❌ Erro ao atender chamado.'); }
 }
 
 async function limparTudo(){
-  if(!confirm('Limpar todos os chamados do banco de dados?'))return;
+  if(!confirm('Limpar todos os chamados do banco de dados?')) return;
   try{
     await apiDelete('chamados?status=eq.pendente');
     renderizar();
-  }catch(e){mostrarAlerta('❌ Erro ao limpar.');}
+  }catch(e){ mostrarAlerta('❌ Erro ao limpar.'); }
 }
 
-// ========== RENDER CHAMADOS ==========
+// ========== RENDER CHAMADOS (LISTA POR LINHA) ==========
 async function renderizar(){
-  try {
-    const lista=await apiGet('chamados?status=eq.pendente&order=timestamp.asc');
+  try{
+    const lista = await apiGet('chamados?status=eq.pendente&order=timestamp.asc');
     setOnline(true);
 
-    // Detecta novos chamados
-    const idsNovos=new Set(lista.map(c=>String(c.id)));
+    const idsNovos = new Set(lista.map(c=>String(c.id)));
     lista.forEach(c=>{
       if(!chamadosAnteriores.has(String(c.id))){
         tocarSom();
-        const info=getTipoInfo(c.tipo);
-        mostrarAlerta(`🔔 MESA ${c.mesa} — ${info.label.toUpperCase()}!${c.obs?' "'+c.obs.substring(0,25)+'"':''}`);
+        const info = getTipoInfo(c.tipo);
+        mostrarAlerta(`🔔 MESA ${c.mesa} — ${info.label.toUpperCase()}!`);
+        registrarPedidoNaMesa(c);
       }
     });
-    chamadosAnteriores=idsNovos;
+    chamadosAnteriores = idsNovos;
 
-    // Stats
-    document.getElementById('stat-pendentes').textContent=lista.length;
-    document.getElementById('stat-atendidos').textContent=atendidosHoje;
-    document.getElementById('stat-mesas').textContent=new Set(lista.map(c=>c.mesa)).size;
-    document.getElementById('stat-pedidos').textContent=lista.filter(c=>c.tipo==='pedido').length;
+    document.getElementById('stat-pendentes').textContent = lista.length;
+    document.getElementById('stat-atendidos').textContent = atendidosHoje;
+    document.getElementById('stat-mesas').textContent = new Set(lista.map(c=>c.mesa)).size;
+    document.getElementById('stat-pedidos').textContent = lista.filter(c=>c.tipo==='pedido'||c.tipo==='pedido_garcom'||c.tipo==='pedido_cozinha').length;
 
-    const grid=document.getElementById('chamados-grid');
-    const empty=document.getElementById('empty-state');
+    const listEl = document.getElementById('chamados-lista');
+    const empty  = document.getElementById('empty-state');
 
-    if(!lista.length){grid.innerHTML='';empty.classList.add('show');}
+    if(!lista.length){ listEl.innerHTML=''; empty.classList.add('show'); }
     else empty.classList.remove('show');
 
-    // Remove cards que não existem mais
-    const idsAtuais=new Set(lista.map(c=>String(c.id)));
-    grid.querySelectorAll('.chamado-card').forEach(el=>{if(!idsAtuais.has(el.dataset.id))el.remove();});
+    const idsAtuais = new Set(lista.map(c=>String(c.id)));
+    listEl.querySelectorAll('.chamado-card').forEach(el=>{ if(!idsAtuais.has(el.dataset.id)) el.remove(); });
 
     lista.forEach(c=>{
-      const info=getTipoInfo(c.tipo);
-      const urgente=(Date.now()-c.timestamp)>120000;
-      let card=grid.querySelector(`[data-id="${c.id}"]`);
+      const info   = getTipoInfo(c.tipo);
+      const urgente= (Date.now()-c.timestamp)>120000;
+      let card = listEl.querySelector(`[data-id="${c.id}"]`);
       if(!card){
-        card=document.createElement('div');
-        card.className=`chamado-card ${info.classe}`;
-        card.dataset.id=c.id;
-        grid.appendChild(card);
+        card = document.createElement('div');
+        card.dataset.id = c.id;
+        listEl.appendChild(card);
       }
-      card.classList.toggle('urgente',urgente);
-      card.innerHTML=`
-        <div class="card-top">
-          <div><div class="mesa-lbl">MESA</div><div class="mesa-big">${c.mesa}</div></div>
-          <div class="tipo-badge"><div class="tipo-emoji">${info.emoji}</div><div class="tipo-label">${info.label}</div></div>
+      card.className = `chamado-card ${info.classe}${urgente?' urgente':''}`;
+
+      // Monta linhas de itens se for pedido com estrutura
+      let itensHtml = '';
+      let obsHtml   = '';
+      if(c.tipo==='pedido_garcom'||c.tipo==='pedido_cozinha'||c.tipo==='pedido'){
+        const itens = parseItensChamado(c.obs||'');
+        if(itens.length){
+          itensHtml = '<div class="card-itens">'
+            + itens.map(it=>{
+                const cat = (c.tipo==='pedido_cozinha') ? 'c' : 'g';
+                return `<div class="card-item-linha">
+                  <span class="item-cat-tag ${cat}">${cat==='g'?'G':'C'}</span>
+                  <span class="item-qty">${it.qty}x</span>
+                  <span class="item-nome">${it.cod?it.cod+' ':''} ${it.desc}</span>
+                  ${it.valor>0?`<span class="item-preco">${fmtBrl(it.qty*it.valor)}</span>`:''}
+                </div>`;
+              }).join('')
+            + '</div>';
+        } else if(c.obs){
+          obsHtml = `<div class="card-obs">💬 ${c.obs}</div>`;
+        }
+      } else {
+        if(c.obs) obsHtml = `<div class="card-obs">💬 ${c.obs}</div>`;
+      }
+
+      // Botão principal
+      let btnLabel = '✅ Atendido';
+      let btnClass = 'orange';
+      if(c.tipo==='conta'){ btnLabel='💳 Ver Conta'; btnClass='green'; }
+      else if(c.tipo==='pedido_cozinha'){ btnLabel='✅ Prato Entregue'; btnClass='teal'; }
+
+      const acaoBtn = c.tipo==='conta'
+        ? `onclick="abrirConta('${c.mesa}',${c.id})"`
+        : `onclick="atender(${c.id},'${c.mesa}','${c.tipo}')"`;
+
+      card.innerHTML = `
+        <div class="card-mesa-col">
+          <div class="mesa-lbl">MESA</div>
+          <div class="mesa-big">${c.mesa}</div>
         </div>
-        ${c.obs?`<div class="card-obs">💬 ${c.obs}</div>`:''}
-        <div class="card-info">
+        <div class="card-body-col">
+          <div class="card-tipo-row">
+            <span class="tipo-badge-linha ${info.classe}">${info.emoji} ${info.label}</span>
+            ${c.tipo==='pedido_garcom'?'<span style="font-size:11px;color:var(--gray);font-weight:600;">→ Garçom serve</span>':''}
+            ${c.tipo==='pedido_cozinha'?'<span style="font-size:11px;color:var(--gray);font-weight:600;">→ Cozinha prepara</span>':''}
+          </div>
+          ${itensHtml}
+          ${obsHtml}
+        </div>
+        <div class="card-tempo-col">
+          <div class="tempo-decorrido" id="tempo-${c.id}">${tempoDecorrido(c.timestamp)}</div>
+          <div class="tempo-lbl">aguardando</div>
           <div class="hora-chamado">⏰ ${c.hora||'—'}</div>
-          <div><div class="tempo-decorrido" id="tempo-${c.id}">${tempoDecorrido(c.timestamp)}</div><div class="tempo-lbl">aguardando</div></div>
         </div>
-        <button class="btn-atender" onclick="atender(${c.id},'${c.mesa}','${c.tipo}')">✅ Marcar como Atendido</button>`;
+        <div class="card-acoes-col">
+          <button class="btn-atender ${btnClass}" ${acaoBtn}>${btnLabel}</button>
+          ${(c.tipo==='pedido'||c.tipo==='pedido_garcom'||c.tipo==='pedido_cozinha')
+            ?`<button class="btn-print-pedido" onclick="imprimirPedido(${JSON.stringify(c).replace(/"/g,'&quot;')})">🖨️ Imprimir</button>`:''}
+        </div>`;
     });
 
-    // Histórico local
-    const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
-    const hs=document.getElementById('history-section');
+    // Timers
+    lista.forEach(c=>{
+      const el = document.getElementById('tempo-'+c.id);
+      if(el) el.textContent = tempoDecorrido(c.timestamp);
+    });
+
+    // Histórico
+    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    const hs   = document.getElementById('history-section');
     if(hist.length){
       hs.style.display='block';
-      document.getElementById('history-list').innerHTML=hist.slice(0,10).map(h=>{
-        const info=getTipoInfo(h.tipo);
+      document.getElementById('history-list').innerHTML = hist.slice(0,10).map(h=>{
+        const info = getTipoInfo(h.tipo);
         return `<div class="history-item">
-          <div><div class="mesa">Mesa ${h.mesa} — ${info.emoji} ${info.label}</div>
-          ${h.obs?`<div class="history-obs">"${h.obs.substring(0,60)}"</div>`:''}</div>
+          <div><div class="mesa">Mesa ${h.mesa} — ${info.emoji} ${info.label}</div></div>
           <span style="white-space:nowrap">✅ ${h.horaAtendido}</span></div>`;
       }).join('');
     } else hs.style.display='none';
 
-  } catch(e){
-    setOnline(false);
-    console.error(e);
-  }
+  }catch(e){ setOnline(false); console.error(e); }
 }
 
-// Atualiza timers
+// Atualiza timers a cada segundo
 setInterval(()=>{
   document.querySelectorAll('[id^="tempo-"]').forEach(el=>{
-    const card=el.closest('.chamado-card');
-    if(card){
-      // timestamp está no card via data, mas vamos só atualizar o display
-      // O tempo é recalculado no próximo poll
-    }
+    const card = el.closest('.chamado-card');
+    if(!card) return;
+    const id   = el.id.replace('tempo-','');
+    // Re-usa timestamp gravado no render — precisaria de um map
+    // Fazemos via rerenderização no próximo poll (3s)
   });
 },1000);
 
 // Polling a cada 3 segundos
-setInterval(renderizar, 3000);
+setInterval(renderizar,3000);
+
+// ========== IMPRIMIR PEDIDO TÉRMICO ==========
+function imprimirPedido(chamado){
+  const cfg   = getConfig();
+  const nomeR = cfg.nome || 'Restaurante';
+  const itens = parseItensChamado(chamado.obs||'');
+  const info  = getTipoInfo(chamado.tipo);
+  const agora = new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+
+  let total = 0;
+  const itensTxt = itens.map(it=>{
+    const sub = it.qty * it.valor; total += sub;
+    return `${String(it.qty+'x').padEnd(4)} ${(it.cod?it.cod+' ':'')+it.desc}\n       ${fmtBrl(sub)}`;
+  }).join('\n');
+
+  const ticket = `
+<div class="print-ticket">
+  <div class="pt-center pt-bold">${nomeR}</div>
+  <div class="pt-center">----- PEDIDO -----</div>
+  <div class="pt-line"></div>
+  <div><b>Mesa:</b> ${chamado.mesa} &nbsp; <b>Tipo:</b> ${info.emoji} ${info.label}</div>
+  <div><b>Hora:</b> ${chamado.hora||agora}</div>
+  <div class="pt-line"></div>
+  ${itens.length ? itens.map(it=>{
+      const sub = it.qty*it.valor;
+      return `<div class="pt-row"><span>${it.qty}x ${it.cod?it.cod+' ':''} ${it.desc}</span><span>${it.valor>0?fmtBrl(sub):''}</span></div>`;
+    }).join('') : `<div>${chamado.obs||'—'}</div>`}
+  <div class="pt-line"></div>
+  ${total>0?`<div class="pt-row pt-total"><span>TOTAL</span><span>${fmtBrl(total)}</span></div>`:''}
+  <div class="pt-center" style="margin-top:8px;font-size:11px;">Garçom Digital • ${agora}</div>
+</div>`;
+
+  document.getElementById('print-area').innerHTML = ticket;
+  window.print();
+}
+
+// ========== CONTA DA MESA ==========
+function abrirConta(mesa, chamadoId){
+  contaMesaAtual = {mesa, chamadoId};
+  const acc = getPedidosMesa();
+  const pedidosMesa = acc[mesa] || [];
+
+  document.getElementById('conta-mesa-num').textContent = mesa;
+  document.getElementById('taxa-check').checked = false;
+
+  // Monta itens por categoria
+  const itensG = []; // garçom
+  const itensC = []; // cozinha
+
+  pedidosMesa.forEach(p=>{
+    p.itens.forEach(it=>{
+      const dest = (p.tipo==='pedido_cozinha') ? itensC : itensG;
+      // Agrupa por cod+desc
+      const ex = dest.find(x=>x.desc===it.desc&&x.cod===it.cod);
+      if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; }
+      else    dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor});
+    });
+  });
+
+  let subG=0, subC=0;
+
+  const renderLinha = (it)=>`
+    <div class="conta-item-linha">
+      <span class="conta-item-nome">${it.cod?'['+it.cod+'] ':''} ${it.desc}</span>
+      <span class="conta-item-qty">${it.qty}× ${fmtBrl(it.valor)}</span>
+      <span class="conta-item-sub">${fmtBrl(it.sub)}</span>
+    </div>`;
+
+  if(itensG.length){
+    subG = itensG.reduce((a,i)=>a+i.sub,0);
+    document.getElementById('conta-itens-garcom').innerHTML = itensG.map(renderLinha).join('');
+    document.getElementById('conta-sub-garcom').textContent = fmtBrl(subG);
+    document.getElementById('conta-sec-garcom').style.display='block';
+  } else {
+    document.getElementById('conta-sec-garcom').style.display='none';
+  }
+  if(itensC.length){
+    subC = itensC.reduce((a,i)=>a+i.sub,0);
+    document.getElementById('conta-itens-cozinha').innerHTML = itensC.map(renderLinha).join('');
+    document.getElementById('conta-sub-cozinha').textContent = fmtBrl(subC);
+    document.getElementById('conta-sec-cozinha').style.display='block';
+  } else {
+    document.getElementById('conta-sec-cozinha').style.display='none';
+  }
+
+  if(!itensG.length && !itensC.length){
+    document.getElementById('conta-sem-pedidos').style.display='block';
+  } else {
+    document.getElementById('conta-sem-pedidos').style.display='none';
+  }
+
+  contaSubtotalPuro = subG + subC;
+  recalcularConta();
+
+  document.getElementById('modal-conta').classList.add('show');
+}
+
+function recalcularConta(){
+  const taxa = document.getElementById('taxa-check').checked;
+  const taxaVal = taxa ? contaSubtotalPuro * 0.1 : 0;
+  const total   = contaSubtotalPuro + taxaVal;
+
+  document.getElementById('taxa-valor').textContent = fmtBrl(taxaVal);
+  document.getElementById('conta-total').textContent = fmtBrl(total);
+  document.getElementById('conta-aviso').textContent =
+    contaSubtotalPuro===0 ? 'Mesa sem pedidos registrados' :
+    taxa ? `Subtotal ${fmtBrl(contaSubtotalPuro)} + Taxa ${fmtBrl(taxaVal)}` : '';
+}
+
+function fecharModalConta(){
+  document.getElementById('modal-conta').classList.remove('show');
+  contaMesaAtual = null;
+}
+
+async function finalizarConta(){
+  if(!contaMesaAtual) return;
+  if(!confirm(`Finalizar e limpar TODOS os chamados e pedidos da Mesa ${contaMesaAtual.mesa}?`)) return;
+
+  try{
+    // Remove todos os chamados pendentes daquela mesa
+    await apiDelete(`chamados?mesa=eq.${contaMesaAtual.mesa}&status=eq.pendente`);
+
+    // Limpa acumulador de pedidos da mesa
+    const acc = getPedidosMesa();
+    delete acc[contaMesaAtual.mesa];
+    setPedidosMesa(acc);
+
+    // Histórico
+    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    hist.unshift({
+      id: contaMesaAtual.chamadoId,
+      mesa: contaMesaAtual.mesa,
+      tipo:'conta',
+      label:'Conta Fechada',
+      horaAtendido: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+    });
+    localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));
+    atendidosHoje++;
+
+    fecharModalConta();
+    mostrarAlerta(`✅ Mesa ${contaMesaAtual?.mesa||''} finalizada! Pronto para novo cliente.`);
+    renderizar();
+  }catch(e){ mostrarAlerta('❌ Erro ao finalizar conta.'); }
+}
+
+function imprimirConta(){
+  if(!contaMesaAtual) return;
+  const cfg   = getConfig();
+  const nomeR = cfg.nome || 'Restaurante';
+  const mesa  = contaMesaAtual.mesa;
+  const acc   = getPedidosMesa();
+  const peds  = acc[mesa] || [];
+  const taxa  = document.getElementById('taxa-check').checked;
+  const agora = new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+
+  const itensG=[], itensC=[];
+  peds.forEach(p=>{
+    p.itens.forEach(it=>{
+      const dest=(p.tipo==='pedido_cozinha')?itensC:itensG;
+      const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod);
+      if(ex){ex.qty+=it.qty;ex.sub+=it.qty*it.valor;}
+      else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor});
+    });
+  });
+
+  const subG = itensG.reduce((a,i)=>a+i.sub,0);
+  const subC = itensC.reduce((a,i)=>a+i.sub,0);
+  const subtotal = subG+subC;
+  const taxaVal  = taxa ? subtotal*0.1 : 0;
+  const total    = subtotal+taxaVal;
+
+  const linhaItem = (it)=>`<div class="pt-row"><span>${it.qty}x ${it.cod?'['+it.cod+'] ':''} ${it.desc}</span><span>${fmtBrl(it.sub)}</span></div>`;
+
+  let html = `<div class="print-ticket">
+    <div class="pt-center pt-bold" style="font-size:15px;">${nomeR}</div>
+    <div class="pt-center">===== CONTA =====</div>
+    <div class="pt-center">Mesa ${mesa} | ${agora}</div>
+    <div class="pt-line"></div>`;
+
+  if(itensG.length){
+    html += `<div class="pt-bold">🟠 GARÇOM</div>`;
+    html += itensG.map(linhaItem).join('');
+    html += `<div class="pt-row"><b>Subtotal Garçom</b><b>${fmtBrl(subG)}</b></div>`;
+    html += `<div class="pt-line"></div>`;
+  }
+  if(itensC.length){
+    html += `<div class="pt-bold">🟢 COZINHA</div>`;
+    html += itensC.map(linhaItem).join('');
+    html += `<div class="pt-row"><b>Subtotal Cozinha</b><b>${fmtBrl(subC)}</b></div>`;
+    html += `<div class="pt-line"></div>`;
+  }
+  if(taxa){
+    html += `<div class="pt-row"><span>Taxa de Serviço (10%)</span><span>${fmtBrl(taxaVal)}</span></div>`;
+    html += `<div class="pt-line"></div>`;
+  }
+  html += `<div class="pt-row pt-total pt-bold"><span>TOTAL</span><span>${fmtBrl(total)}</span></div>`;
+  html += `<div class="pt-center" style="margin-top:10px;font-size:11px;">Obrigado pela visita!</div>`;
+  html += `<div class="pt-center" style="font-size:11px;">Garçom Digital</div>`;
+  html += `</div>`;
+
+  document.getElementById('print-area').innerHTML = html;
+  window.print();
+}
 
 // ========== CONFIG ==========
-function getConfig(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}');}catch{return{};}}
+function getConfig(){ try{ return JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}'); }catch{ return{}; } }
 function salvarConfig(){
-  localStorage.setItem(CONFIG_KEY,JSON.stringify({
-    nome:document.getElementById('cfg-nome').value||'Restaurante',
-    msgQr:document.getElementById('cfg-msg-qr').value||'📱 Escaneie para Chamar o Garçom / Fazer Pedido'
+  localStorage.setItem(CONFIG_KEY, JSON.stringify({
+    nome: document.getElementById('cfg-nome').value||'Restaurante',
+    msgQr: document.getElementById('cfg-msg-qr').value||'📱 Escaneie para Chamar o Garçom / Fazer Pedido'
   }));
   document.getElementById('topbar-name').textContent='Painel — '+(document.getElementById('cfg-nome').value||'Garçom Digital');
 }
 function carregarConfig(){
-  const cfg=getConfig();
-  if(cfg.nome){document.getElementById('cfg-nome').value=cfg.nome;document.getElementById('topbar-name').textContent='Painel — '+cfg.nome;}
-  if(cfg.msgQr)document.getElementById('cfg-msg-qr').value=cfg.msgQr;
+  const cfg = getConfig();
+  if(cfg.nome){ document.getElementById('cfg-nome').value=cfg.nome; document.getElementById('topbar-name').textContent='Painel — '+cfg.nome; }
+  if(cfg.msgQr) document.getElementById('cfg-msg-qr').value=cfg.msgQr;
 }
 
 // ========== CARDÁPIO ==========
-function getCardapio(){try{return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]');}catch{return[];}}
-function saveCardapio(arr){localStorage.setItem(CARDAPIO_KEY,JSON.stringify(arr));}
+function getCardapio(){ try{ return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]'); }catch{ return[]; } }
+function saveCardapio(arr){ localStorage.setItem(CARDAPIO_KEY, JSON.stringify(arr)); }
 
 function renderCardapio(){
-  const items=getCardapio();
-  const tbody=document.getElementById('cardapio-tbody');
-  const table=document.getElementById('cardapio-table');
-  const empty=document.getElementById('cardapio-empty-msg');
-  if(!items.length){table.style.display='none';empty.style.display='block';}
-  else{
-    empty.style.display='none';table.style.display='table';
-    tbody.innerHTML=items.map(i=>`
-      <tr>
-        <td><strong>${i.cod}</strong></td>
-        <td>${i.desc}</td>
-        <td>R$ ${parseFloat(i.valor).toFixed(2)}</td>
-        <td><button class="btn-sm red" onclick="removerItem('${i.id}')">✕</button></td>
-      </tr>`).join('');
-  }
-  // Restaura preview do arquivo carregado
-  const arqUrl=localStorage.getItem(CARDAPIO_FILE_KEY);
-  const arqNome=localStorage.getItem(CARDAPIO_FILE_NAME);
-  const prevEl=document.getElementById('file-preview');
-  const areaEl=document.getElementById('upload-preview-area');
+  const items = getCardapio();
+  const gItems = items.filter(i=>i.cat==='garcom'||!i.cat);
+  const cItems = items.filter(i=>i.cat==='cozinha');
+
+  const renderTabela = (list, tbodyId, tableId, emptyId)=>{
+    const tbody = document.getElementById(tbodyId);
+    const table = document.getElementById(tableId);
+    const empty = document.getElementById(emptyId);
+    if(!list.length){ table.style.display='none'; empty.style.display='block'; }
+    else{
+      empty.style.display='none'; table.style.display='table';
+      tbody.innerHTML = list.map(i=>`
+        <tr>
+          <td><strong>${i.cod}</strong></td>
+          <td>${i.desc}</td>
+          <td>${fmtBrl(i.valor)}</td>
+          <td><button class="btn-sm red" onclick="removerItem('${i.id}')">✕</button></td>
+        </tr>`).join('');
+    }
+  };
+
+  renderTabela(gItems,'tbody-garcom','table-garcom','cardapio-empty-garcom');
+  renderTabela(cItems,'tbody-cozinha','table-cozinha','cardapio-empty-cozinha');
+
+  // Preview arquivo
+  const arqUrl  = localStorage.getItem(CARDAPIO_FILE_KEY);
+  const arqNome = localStorage.getItem(CARDAPIO_FILE_NAME);
+  const prevEl  = document.getElementById('file-preview');
+  const areaEl  = document.getElementById('upload-preview-area');
   if(arqUrl){
     prevEl.style.display='flex';
     document.getElementById('file-name').textContent=(arqNome||'Arquivo carregado')+' ✅';
-    // Mostra preview se for URL de imagem (base64 ou pública)
     if(arqUrl.startsWith('data:image')||(!arqUrl.includes('.pdf')&&!arqUrl.includes('pdf'))){
-      areaEl.style.display='block';
-      areaEl.innerHTML='<img src="'+arqUrl+'" alt="Preview" style="width:100%;display:block;">';
-    } else if(arqUrl.startsWith('data:application/pdf')||arqUrl.includes('.pdf')){
-      areaEl.style.display='block';
-      areaEl.innerHTML='<iframe src="'+arqUrl+'" style="width:100%;height:400px;border:none;display:block;"></iframe>';
+      areaEl.style.display='block'; areaEl.innerHTML='<img src="'+arqUrl+'" style="width:100%;display:block;">';
+    } else {
+      areaEl.style.display='block'; areaEl.innerHTML='<iframe src="'+arqUrl+'" style="width:100%;height:400px;border:none;display:block;"></iframe>';
     }
-  } else {
-    prevEl.style.display='none';
-    areaEl.style.display='none';
-  }
+  } else { prevEl.style.display='none'; areaEl.style.display='none'; }
 }
 
 function adicionarItem(){
-  const cod=document.getElementById('new-cod').value.trim();
-  const desc=document.getElementById('new-desc').value.trim();
-  const valor=document.getElementById('new-valor').value;
-  if(!cod||!desc||!valor){mostrarAlerta('⚠️ Preencha código, descrição e valor!');return;}
-  const items=getCardapio();
-  items.push({id:Date.now().toString(),cod,desc,valor:parseFloat(valor)});
+  const cat   = document.getElementById('new-cat').value;
+  const cod   = document.getElementById('new-cod').value.trim();
+  const desc  = document.getElementById('new-desc').value.trim();
+  const valor = document.getElementById('new-valor').value;
+  if(!cod||!desc||!valor){ mostrarAlerta('⚠️ Preencha código, descrição e valor!'); return; }
+  const items = getCardapio();
+  items.push({id:Date.now().toString(),cat,cod,desc,valor:parseFloat(valor)});
   saveCardapio(items);
   document.getElementById('new-cod').value='';
   document.getElementById('new-desc').value='';
@@ -599,45 +1062,36 @@ function removerItem(id){
 }
 
 function limparCardapio(){
-  if(!confirm('Limpar todo o cardápio?'))return;
-  saveCardapio([]);renderCardapio();mostrarAlerta('Cardápio limpo!');
+  if(!confirm('Limpar todo o cardápio?')) return;
+  saveCardapio([]); renderCardapio(); mostrarAlerta('Cardápio limpo!');
 }
 
 function limparHistoricoLocal(){
-  if(!confirm('Limpar histórico?'))return;
-  localStorage.removeItem(HISTORY_KEY);renderizar();
+  if(!confirm('Limpar histórico?')) return;
+  localStorage.removeItem(HISTORY_KEY); renderizar();
 }
 
-// UPLOAD — faz upload para Supabase Storage e salva URL na tabela config
+// ========== UPLOAD ==========
 async function processarUpload(e){
-  const file=e.target.files[0];
-  if(!file)return;
-  if(file.size>5*1024*1024){mostrarAlerta('⚠️ Arquivo muito grande! Máx. 5MB.');return;}
-
-  // Pré-visualização local imediata (antes do upload)
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    mostrarPreviewLocal(ev.target.result, file.name, file.type);
-  };
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){ mostrarAlerta('⚠️ Arquivo muito grande! Máx. 5MB.'); return; }
+  const reader = new FileReader();
+  reader.onload=ev=>{ mostrarPreviewLocal(ev.target.result,file.name,file.type); };
   reader.readAsDataURL(file);
-
-  // Upload para Supabase Storage
   const uploadText=document.getElementById('upload-text');
   uploadText.textContent='⏳ Enviando arquivo...';
   try{
     const ext=file.name.split('.').pop().toLowerCase();
     const fileName='cardapio_'+Date.now()+'.'+ext;
     const uploadRes=await fetch(SUPABASE_URL+'/storage/v1/object/cardapios/'+fileName,{
-      method:'POST',
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type},
-      body:file
+      method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type},body:file
     });
     if(!uploadRes.ok){
-      // Fallback: salva base64 no localStorage se storage não estiver configurado
       const r2=new FileReader();
       r2.onload=ev2=>{
-        localStorage.setItem(CARDAPIO_FILE_KEY, ev2.target.result);
-        localStorage.setItem(CARDAPIO_FILE_NAME, file.name);
+        localStorage.setItem(CARDAPIO_FILE_KEY,ev2.target.result);
+        localStorage.setItem(CARDAPIO_FILE_NAME,file.name);
         uploadText.textContent='Clique para selecionar arquivo';
         document.getElementById('file-preview').style.display='flex';
         document.getElementById('file-name').textContent=file.name+' ✅';
@@ -647,33 +1101,23 @@ async function processarUpload(e){
       return;
     }
     const publicUrl=SUPABASE_URL+'/storage/v1/object/public/cardapios/'+fileName;
-    // Salva URL na tabela config do Supabase
-    await fetch(SUPABASE_URL+'/rest/v1/config',{
-      method:'POST',
-      headers:{...HEADERS,'Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id:1, cardapio_url:publicUrl, cardapio_nome:file.name})
-    });
-    localStorage.setItem(CARDAPIO_FILE_KEY, publicUrl);
-    localStorage.setItem(CARDAPIO_FILE_NAME, file.name);
+    await fetch(SUPABASE_URL+'/rest/v1/config',{method:'POST',headers:{...HEADERS,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({id:1,cardapio_url:publicUrl,cardapio_nome:file.name})});
+    localStorage.setItem(CARDAPIO_FILE_KEY,publicUrl);
+    localStorage.setItem(CARDAPIO_FILE_NAME,file.name);
     document.getElementById('file-preview').style.display='flex';
     document.getElementById('file-name').textContent=file.name+' ✅ (publicado)';
     uploadText.textContent='Clique para selecionar arquivo';
-    mostrarAlerta('✅ Cardápio publicado! Clientes já podem visualizar.');
-  }catch(err){
-    uploadText.textContent='Clique para selecionar arquivo';
-    mostrarAlerta('⚠️ Erro no upload. Cardápio salvo localmente.');
-    console.error(err);
-  }
+    mostrarAlerta('✅ Cardápio publicado!');
+  }catch(err){ uploadText.textContent='Clique para selecionar arquivo'; mostrarAlerta('⚠️ Erro no upload. Cardápio salvo localmente.'); }
 }
 
-function mostrarPreviewLocal(src, nome, tipo){
+function mostrarPreviewLocal(src,nome,tipo){
   const area=document.getElementById('upload-preview-area');
   area.style.display='block';
-  const isPdf=tipo==='application/pdf'||nome.endsWith('.pdf');
-  if(isPdf){
+  if(tipo==='application/pdf'||nome.endsWith('.pdf')){
     area.innerHTML='<iframe src="'+src+'" style="width:100%;height:400px;border:none;display:block;"></iframe>';
-  } else {
-    area.innerHTML='<img src="'+src+'" alt="Preview do cardápio" style="width:100%;display:block;">';
+  }else{
+    area.innerHTML='<img src="'+src+'" style="width:100%;display:block;">';
   }
 }
 
@@ -684,24 +1128,15 @@ function removerArquivo(){
   document.getElementById('upload-preview-area').style.display='none';
   document.getElementById('upload-preview-area').innerHTML='';
   document.getElementById('file-upload').value='';
-  // Remove URL do Supabase também
-  fetch(SUPABASE_URL+'/rest/v1/config?id=eq.1',{
-    method:'PATCH',
-    headers:{...HEADERS,'Prefer':'return=minimal'},
-    body:JSON.stringify({cardapio_url:null,cardapio_nome:null})
-  }).catch(()=>{});
+  fetch(SUPABASE_URL+'/rest/v1/config?id=eq.1',{method:'PATCH',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({cardapio_url:null,cardapio_nome:null})}).catch(()=>{});
   mostrarAlerta('Arquivo removido.');
 }
 
 // ========== QR CODE ==========
-function getBaseUrl(){
-  const base=window.location.href.replace(/painel\.html.*$/,'');
-  return base;
-}
+function getBaseUrl(){ return window.location.href.replace(/painel\.html.*$/,''); }
 function buildUrl(mesaNum){
   const cfg=getConfig();
-  const nome=cfg.nome||'Restaurante';
-  return `${getBaseUrl()}mesa.html?mesa=${mesaNum}&nome=${encodeURIComponent(nome)}`;
+  return `${getBaseUrl()}mesa.html?mesa=${mesaNum}&nome=${encodeURIComponent(cfg.nome||'Restaurante')}`;
 }
 
 function gerarQR(){
@@ -723,7 +1158,7 @@ function gerarQR(){
 function gerarMultiplosQR(){
   const de=parseInt(document.getElementById('mesa-de').value)||1;
   const ate=parseInt(document.getElementById('mesa-ate').value)||10;
-  if(ate<de||ate-de>49){mostrarAlerta('⚠️ Máximo 50 mesas por vez.');return;}
+  if(ate<de||ate-de>49){ mostrarAlerta('⚠️ Máximo 50 mesas por vez.'); return; }
   const cfg=getConfig();
   const grid=document.getElementById('multi-qr-grid');
   grid.innerHTML='';
@@ -742,16 +1177,16 @@ function gerarMultiplosQR(){
   mostrarAlerta(`✅ ${ate-de+1} QR Codes gerados!`);
 }
 
-function fecharModal(){document.getElementById('modal').classList.remove('show');}
-function copiarLink(){navigator.clipboard.writeText(qrLinkAtual).then(()=>{mostrarAlerta('✅ Link copiado!');fecharModal();});}
+function fecharModal(){ document.getElementById('modal').classList.remove('show'); }
+function copiarLink(){ navigator.clipboard.writeText(qrLinkAtual).then(()=>{ mostrarAlerta('✅ Link copiado!'); fecharModal(); }); }
 
 // ========== PAGES ==========
 function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(id==='cardapio')renderCardapio();
+  if(btn) btn.classList.add('active');
+  if(id==='cardapio') renderCardapio();
 }
 
 // ========== INIT ==========

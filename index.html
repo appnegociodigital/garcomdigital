@@ -907,10 +907,8 @@ const modoMesa = urlParams.has('mesa');
 if(modoMesa){
   document.getElementById('view-painel').style.display = 'none';
   document.getElementById('view-mesa').classList.add('show');
-  inicializarMesa();
-} else {
+}else{
   document.getElementById('view-painel').style.display = 'block';
-  inicializarPainel();
 }
 
 // ====================================================
@@ -1695,6 +1693,11 @@ function mesaRenderCardapioDownload(){
 
 function toggleSection(id){ const b=document.getElementById('body-'+id); const c=document.getElementById('chev-'+id); b.classList.toggle('open'); c.classList.toggle('open'); if(b.classList.contains('open')&&id==='cardapio-dl') mesaRenderCardapioDownload(); }
 function fecharSection(id){ document.getElementById('body-'+id).classList.remove('open'); document.getElementById('chev-'+id).classList.remove('open'); }
+
+// ====================================================
+// INIT — chamado aqui após todas as declarações
+// ====================================================
+if(modoMesa){ inicializarMesa(); } else { inicializarPainel(); }
 </script>
 </body>
 </html>

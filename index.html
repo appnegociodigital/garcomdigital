@@ -275,6 +275,29 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
 .senha-perigo-input{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;background:white;width:150px;}
 .senha-perigo-input:focus{border-color:var(--red);}
 
+/* ====== CONFIG LOCK OVERLAY ====== */
+.config-lock-overlay{position:absolute;inset:0;background:rgba(240,237,232,0.97);z-index:10;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:300px;}
+.config-lock-box{background:white;border-radius:24px;padding:36px 32px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.15);text-align:center;}
+.config-lock-icon{font-size:52px;margin-bottom:12px;}
+.config-lock-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:6px;}
+.config-lock-sub{font-size:13px;color:var(--gray);font-weight:600;margin-bottom:22px;line-height:1.5;}
+.config-lock-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:16px;}
+.config-lock-digit{width:58px;height:68px;border:2px solid var(--border);border-radius:14px;font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:all 0.2s;-webkit-appearance:none;}
+.config-lock-digit:focus{border-color:var(--orange);background:var(--orange-light);box-shadow:0 0 0 3px rgba(255,107,53,0.15);}
+.config-lock-digit.filled{border-color:var(--green);background:var(--green-light);}
+.config-lock-digit.error{border-color:var(--red);background:var(--red-light);animation:shake 0.4s ease;}
+.config-lock-error{color:var(--red-dark);font-size:13px;font-weight:700;margin-bottom:12px;display:none;background:var(--red-light);padding:9px 14px;border-radius:10px;}
+.config-lock-error.show{display:block;}
+.config-lock-btn{width:100%;padding:13px;border:none;border-radius:12px;background:var(--orange);color:white;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:filter 0.2s;}
+.config-lock-btn:hover{filter:brightness(0.9);}
+#page-config{position:relative;}
+.senha-config-form{background:var(--bg);border-radius:12px;padding:16px;margin-top:14px;}
+.senha-config-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.senha-config-input{border:2px solid var(--border);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;background:white;width:150px;transition:border 0.2s;}
+.senha-config-input:focus{border-color:var(--orange);}
+.btn-lock-config{padding:7px 14px;border:2px solid var(--border);border-radius:9px;background:var(--bg);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray);transition:all 0.15s;margin-left:8px;}
+.btn-lock-config:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
 .horario-card{background:var(--bg);border-radius:12px;padding:14px;margin-top:14px;}
 .horario-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
 .horario-toggle{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 16px;margin-top:10px;box-shadow:var(--shadow);flex-wrap:wrap;gap:12px;}
@@ -590,6 +613,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn orange" onclick="abrirPedidoManual()">📝 Pedido Manual</button>
+      <button class="btn green" onclick="abrirContaManual()">💳 Gerar Conta</button>
       <button class="btn red" onclick="limparTudo()">🗑️ Limpar Tudo</button>
     </div>
   </div>
@@ -740,99 +764,127 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
 
 <!-- ============ CONFIG ============ -->
 <div class="page" id="page-config">
-  <div class="settings-row">
-    <div class="settings-row-title">🏪 Nome do Restaurante</div>
-    <div class="form-row">
-      <input class="form-input wide" type="text" id="cfg-nome" value="Restaurante" placeholder="Nome do restaurante" oninput="salvarConfig()">
-    </div>
-  </div>
-  <div class="settings-row">
-    <div class="settings-row-title">💬 Mensagem no QR Code</div>
-    <input class="form-input" style="width:100%" type="text" id="cfg-msg-qr" value="📱 Escaneie para Chamar o Garçom / Fazer Pedido" oninput="salvarConfig()">
-  </div>
-  <div class="settings-row">
-    <div class="settings-row-title">🕐 Horário de Funcionamento</div>
-    <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:12px;">Fora desse horário, a mesa exibe aviso de fechado e bloqueia pedidos automaticamente.</p>
-    <div class="horario-card">
-      <div class="horario-row">
-        <span class="form-label">Abertura:</span>
-        <input class="form-input time" type="time" id="cfg-hora-abertura" value="10:00" oninput="salvarConfig()">
-        <span class="form-label">Fechamento:</span>
-        <input class="form-input time" id="cfg-hora-fechamento" type="time" value="23:00" oninput="salvarConfig()">
-        <button class="btn blue" onclick="set24h()" title="Define 00:00 para ambos — restaurante sempre aberto">🕐 24h</button>
-        <button class="btn gray" onclick="testarHorario()">🔍 Testar</button>
+
+  <!-- LOCK OVERLAY -->
+  <div class="config-lock-overlay" id="config-lock-overlay">
+    <div class="config-lock-box">
+      <div class="config-lock-icon">🔐</div>
+      <div class="config-lock-title">Área Restrita</div>
+      <div class="config-lock-sub">Digite a senha de acesso para entrar nas configurações do sistema.</div>
+      <div class="config-lock-inputs" id="config-lock-inputs">
+        <input class="config-lock-digit" type="password" maxlength="1" id="cld0" oninput="cfgDigitInput(this,0)" onkeydown="cfgDigitKey(event,0)">
+        <input class="config-lock-digit" type="password" maxlength="1" id="cld1" oninput="cfgDigitInput(this,1)" onkeydown="cfgDigitKey(event,1)">
+        <input class="config-lock-digit" type="password" maxlength="1" id="cld2" oninput="cfgDigitInput(this,2)" onkeydown="cfgDigitKey(event,2)">
+        <input class="config-lock-digit" type="password" maxlength="1" id="cld3" oninput="cfgDigitInput(this,3)" onkeydown="cfgDigitKey(event,3)">
       </div>
-    </div>
-    <div class="horario-toggle">
-      <label class="toggle-switch">
-        <input type="checkbox" id="cfg-manual-aberto" onchange="onManualCheckChange(this)">
-        <span class="toggle-slider"></span>
-      </label>
-      <div style="flex:1">
-        <div class="toggle-label">🔧 Controle Manual de Abertura</div>
-        <div style="font-size:12px;color:var(--gray);font-weight:600;">Substitui o horário automático — útil para folgas, eventos, imprevistos</div>
-      </div>
-      <span class="toggle-status" id="manual-status-txt">Usando horário automático</span>
-    </div>
-  </div>
-  <div class="settings-row">
-    <div class="settings-row-title">💳 Taxa de Serviço Padrão (10%)</div>
-    <div class="form-row" style="align-items:flex-start;flex-direction:column;gap:10px;">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;">
-        <input type="checkbox" id="cfg-taxa-padrao" style="width:18px;height:18px;cursor:pointer;" onchange="salvarConfig()">
-        Marcar taxa de 10% como padrão ao abrir a conta
-      </label>
-      <span style="font-size:13px;color:var(--gray);font-weight:600;">Quando ativado, o checkbox da taxa já vem marcado no fechamento da conta.</span>
-    </div>
-  </div>
-  <div class="settings-row" style="border:2px solid var(--red-light);">
-    <div class="settings-row-title" style="color:var(--red-dark);">🔴 Zona de Perigo</div>
-    <div class="perigo-row">
-      <button class="btn red" onclick="solicitarSenhaPerigo('limparHistoricoLocal')">🗑️ Limpar Histórico</button>
-      <button class="btn red" onclick="solicitarSenhaPerigo('limparCardapio')">🗑️ Limpar Cardápio</button>
-      <button class="btn red" onclick="solicitarSenhaPerigo('limparTudo')">🗑️ Limpar Chamados</button>
-    </div>
-    <div class="senha-perigo-form">
-      <div class="senha-perigo-label">🔑 Alterar Senha da Zona de Perigo</div>
-      <div class="senha-perigo-inputs">
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:11px;font-weight:700;color:var(--red-dark);">Senha Atual</label>
-          <input class="senha-perigo-input" type="password" id="senha-atual-input" placeholder="••••" maxlength="20">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:11px;font-weight:700;color:var(--red-dark);">Nova Senha</label>
-          <input class="senha-perigo-input" type="password" id="senha-nova-input" placeholder="••••" maxlength="20">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label style="font-size:11px;font-weight:700;color:var(--red-dark);">Confirmar Nova</label>
-          <input class="senha-perigo-input" type="password" id="senha-confirma-input" placeholder="••••" maxlength="20" onkeydown="if(event.key==='Enter')alterarSenhaPerigo()">
-        </div>
-        <div style="display:flex;align-items:flex-end;">
-          <button class="btn red" onclick="alterarSenhaPerigo()" style="white-space:nowrap;">🔑 Alterar Senha</button>
-        </div>
-      </div>
+      <div class="config-lock-error" id="config-lock-error">❌ Senha incorreta. Tente novamente.</div>
+      <button class="config-lock-btn" onclick="confirmarLockConfig()">🔓 Entrar nas Configurações</button>
     </div>
   </div>
 
-  <!-- RELATÓRIO DE FATURAMENTO -->
-  <div class="settings-row">
-    <div class="rel-header">
-      <div class="rel-title">📊 Relatório de Faturamento do Dia</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <button class="rel-toggle-val" id="btn-toggle-valores" onclick="toggleValoresRelatorio()">👁️ Ocultar Valores</button>
-        <button class="btn blue" onclick="gerarRelatorio()" style="padding:7px 14px;font-size:12px;">🔄 Atualizar</button>
+  <!-- CONTEÚDO DA CONFIG (visível após autenticação) -->
+  <div id="config-content">
+    <!-- Barra de status desbloqueado -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--green-light);border:2px solid var(--green);border-radius:12px;padding:10px 16px;margin-bottom:16px;">
+      <span style="font-size:13px;font-weight:700;color:var(--green-dark);">🔓 Configurações desbloqueadas</span>
+      <button class="btn-lock-config" onclick="lockConfig()">🔒 Bloquear</button>
+    </div>
+
+    <!-- SENHA DE ACESSO -->
+    <div class="settings-row" style="border:2px solid var(--orange-light);">
+      <div class="settings-row-title" style="color:var(--orange-dark);">🔑 Senha de Acesso às Configurações</div>
+      <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:10px;">Esta senha protege toda a aba de configurações. Padrão: <strong>1234</strong></p>
+      <div class="senha-config-form">
+        <div class="senha-config-row">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;font-weight:700;color:var(--gray);">Senha Atual</label>
+            <input class="senha-config-input" type="password" id="cfg-senha-atual" placeholder="••••" maxlength="20">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;font-weight:700;color:var(--gray);">Nova Senha</label>
+            <input class="senha-config-input" type="password" id="cfg-senha-nova" placeholder="••••" maxlength="20">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;font-weight:700;color:var(--gray);">Confirmar Nova</label>
+            <input class="senha-config-input" type="password" id="cfg-senha-confirma" placeholder="••••" maxlength="20" onkeydown="if(event.key==='Enter')alterarSenhaConfig()">
+          </div>
+          <button class="btn orange" onclick="alterarSenhaConfig()">🔑 Alterar Senha</button>
+        </div>
       </div>
     </div>
-    <div class="rel-stats" id="rel-stats-container">
-      <div class="rel-stat orange"><div class="rel-stat-num" id="rel-total-atendimentos">—</div><div class="rel-stat-label">Atendimentos</div></div>
-      <div class="rel-stat green"><div class="rel-stat-num" id="rel-faturamento-total">—</div><div class="rel-stat-label">Faturamento Total</div></div>
-      <div class="rel-stat blue"><div class="rel-stat-num" id="rel-ticket-medio">—</div><div class="rel-stat-label">Ticket Médio</div></div>
-      <div class="rel-stat purple"><div class="rel-stat-num" id="rel-mesas-atendidas">—</div><div class="rel-stat-label">Mesas Atendidas</div></div>
+    <div class="settings-row">
+      <div class="settings-row-title">🏪 Nome do Restaurante</div>
+      <div class="form-row">
+        <input class="form-input wide" type="text" id="cfg-nome" value="Restaurante" placeholder="Nome do restaurante" oninput="salvarConfig()">
+      </div>
     </div>
-    <div style="font-size:13px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Detalhes por Mesa</div>
-    <div id="rel-mesas-lista"><div class="rel-vazio">Clique em "Atualizar" para gerar o relatório.</div></div>
-  </div>
-</div>
+    <div class="settings-row">
+      <div class="settings-row-title">💬 Mensagem no QR Code</div>
+      <input class="form-input" style="width:100%" type="text" id="cfg-msg-qr" value="📱 Escaneie para Chamar o Garçom / Fazer Pedido" oninput="salvarConfig()">
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-title">🕐 Horário de Funcionamento</div>
+      <p style="font-size:13px;color:var(--gray);font-weight:600;margin-bottom:12px;">Fora desse horário, a mesa exibe aviso de fechado e bloqueia pedidos automaticamente.</p>
+      <div class="horario-card">
+        <div class="horario-row">
+          <span class="form-label">Abertura:</span>
+          <input class="form-input time" type="time" id="cfg-hora-abertura" value="10:00" oninput="salvarConfig()">
+          <span class="form-label">Fechamento:</span>
+          <input class="form-input time" id="cfg-hora-fechamento" type="time" value="23:00" oninput="salvarConfig()">
+          <button class="btn blue" onclick="set24h()" title="Define 00:00 para ambos — restaurante sempre aberto">🕐 24h</button>
+          <button class="btn gray" onclick="testarHorario()">🔍 Testar</button>
+        </div>
+      </div>
+      <div class="horario-toggle">
+        <label class="toggle-switch">
+          <input type="checkbox" id="cfg-manual-aberto" onchange="onManualCheckChange(this)">
+          <span class="toggle-slider"></span>
+        </label>
+        <div style="flex:1">
+          <div class="toggle-label">🔧 Controle Manual de Abertura</div>
+          <div style="font-size:12px;color:var(--gray);font-weight:600;">Substitui o horário automático — útil para folgas, eventos, imprevistos</div>
+        </div>
+        <span class="toggle-status" id="manual-status-txt">Usando horário automático</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-title">💳 Taxa de Serviço Padrão (10%)</div>
+      <div class="form-row" style="align-items:flex-start;flex-direction:column;gap:10px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;">
+          <input type="checkbox" id="cfg-taxa-padrao" style="width:18px;height:18px;cursor:pointer;" onchange="salvarConfig()">
+          Marcar taxa de 10% como padrão ao abrir a conta
+        </label>
+        <span style="font-size:13px;color:var(--gray);font-weight:600;">Quando ativado, o checkbox da taxa já vem marcado no fechamento da conta.</span>
+      </div>
+    </div>
+    <div class="settings-row" style="border:2px solid var(--red-light);">
+      <div class="settings-row-title" style="color:var(--red-dark);">🔴 Zona de Perigo</div>
+      <div class="perigo-row">
+        <button class="btn red" onclick="solicitarSenhaPerigo('limparHistoricoLocal')">🗑️ Limpar Histórico</button>
+        <button class="btn red" onclick="solicitarSenhaPerigo('limparCardapio')">🗑️ Limpar Cardápio</button>
+        <button class="btn red" onclick="solicitarSenhaPerigo('limparTudo')">🗑️ Limpar Chamados</button>
+      </div>
+    </div>
+    <!-- RELATÓRIO DE FATURAMENTO -->
+    <div class="settings-row">
+      <div class="rel-header">
+        <div class="rel-title">📊 Relatório de Faturamento do Dia</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="rel-toggle-val" id="btn-toggle-valores" onclick="toggleValoresRelatorio()">👁️ Ocultar Valores</button>
+          <button class="btn blue" onclick="gerarRelatorio()" style="padding:7px 14px;font-size:12px;">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="rel-stats" id="rel-stats-container">
+        <div class="rel-stat orange"><div class="rel-stat-num" id="rel-total-atendimentos">—</div><div class="rel-stat-label">Atendimentos</div></div>
+        <div class="rel-stat green"><div class="rel-stat-num" id="rel-faturamento-total">—</div><div class="rel-stat-label">Faturamento Total</div></div>
+        <div class="rel-stat blue"><div class="rel-stat-num" id="rel-ticket-medio">—</div><div class="rel-stat-label">Ticket Médio</div></div>
+        <div class="rel-stat purple"><div class="rel-stat-num" id="rel-mesas-atendidas">—</div><div class="rel-stat-label">Mesas Atendidas</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Detalhes por Mesa</div>
+      <div id="rel-mesas-lista"><div class="rel-vazio">Clique em "Atualizar" para gerar o relatório.</div></div>
+    </div>
+  </div><!-- /config-content -->
+</div><!-- /page-config -->
 
 </div><!-- /view-painel -->
 
@@ -1946,6 +1998,7 @@ function showPage(id,btn){
   if(btn) btn.classList.add('active');
   if(id==='cardapio') renderCardapio();
   if(id==='mesas'){ carregarSessoes().then(renderMesasSessoes); }
+  if(id==='config'){ verificarLockConfig(); }
 }
 
 // ====================================================
@@ -2323,21 +2376,122 @@ function abrirHistoricoDetalhe(idx){
 }
 
 // ====================================================
-// ALTERAR SENHA ZONA DE PERIGO
+// CONFIG LOCK — proteção por senha da aba Configurações
 // ====================================================
-function alterarSenhaPerigo(){
-  const atual=document.getElementById('senha-atual-input').value;
-  const nova=document.getElementById('senha-nova-input').value;
-  const confirma=document.getElementById('senha-confirma-input').value;
+let configDesbloqueado = false;
+let configLockTimer = null;
+
+function verificarLockConfig(){
+  if(configDesbloqueado) return;
+  document.getElementById('config-lock-overlay').style.display='flex';
+  document.getElementById('config-content').style.display='none';
+  // Limpa dígitos
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('cld'+i);
+    d.value=''; d.className='config-lock-digit';
+  }
+  document.getElementById('config-lock-error').classList.remove('show');
+  setTimeout(()=>{ try{ document.getElementById('cld0').focus(); }catch{} },200);
+}
+
+function cfgDigitInput(el,idx){
+  const v=el.value.replace(/[^0-9]/g,'');
+  el.value=v?v[v.length-1]:'';
+  if(el.value){ el.classList.add('filled'); if(idx<3) document.getElementById('cld'+(idx+1)).focus(); else confirmarLockConfig(); }
+  else el.classList.remove('filled');
+}
+
+function cfgDigitKey(e,idx){
+  if(e.key==='Backspace'&&!document.getElementById('cld'+idx).value&&idx>0){
+    const prev=document.getElementById('cld'+(idx-1));
+    prev.value=''; prev.classList.remove('filled'); prev.focus();
+  }
+  if(e.key==='Enter') confirmarLockConfig();
+}
+
+function confirmarLockConfig(){
+  const val=[0,1,2,3].map(i=>document.getElementById('cld'+i).value).join('');
+  if(val!==getSenhaPerigo()){
+    for(let i=0;i<4;i++){ const d=document.getElementById('cld'+i); d.classList.add('error'); setTimeout(()=>d.classList.remove('error'),500); d.value=''; d.classList.remove('filled'); }
+    document.getElementById('config-lock-error').classList.add('show');
+    document.getElementById('cld0').focus();
+    return;
+  }
+  document.getElementById('config-lock-overlay').style.display='none';
+  document.getElementById('config-content').style.display='block';
+  configDesbloqueado=true;
+  // Auto-bloqueia após 10 minutos de inatividade
+  resetConfigLockTimer();
+}
+
+function resetConfigLockTimer(){
+  clearTimeout(configLockTimer);
+  configLockTimer=setTimeout(()=>{ lockConfig(); mostrarAlerta('🔒 Config bloqueada por inatividade.'); }, 10*60*1000);
+}
+
+function lockConfig(){
+  configDesbloqueado=false;
+  clearTimeout(configLockTimer);
+  document.getElementById('config-lock-overlay').style.display='flex';
+  document.getElementById('config-content').style.display='none';
+  for(let i=0;i<4;i++){ const d=document.getElementById('cld'+i); d.value=''; d.className='config-lock-digit'; }
+  document.getElementById('config-lock-error').classList.remove('show');
+  mostrarAlerta('🔒 Configurações bloqueadas.');
+}
+
+// ====================================================
+// ALTERAR SENHA DE ACESSO (Config)
+// ====================================================
+function alterarSenhaConfig(){
+  const atual=document.getElementById('cfg-senha-atual').value;
+  const nova=document.getElementById('cfg-senha-nova').value;
+  const confirma=document.getElementById('cfg-senha-confirma').value;
   if(atual!==getSenhaPerigo()){ mostrarAlerta('❌ Senha atual incorreta!'); return; }
   if(!nova||nova.length<4){ mostrarAlerta('⚠️ A nova senha deve ter pelo menos 4 caracteres.'); return; }
-  if(nova!==confirma){ mostrarAlerta('❌ A nova senha e a confirmação não coincidem!'); return; }
+  if(nova!==confirma){ mostrarAlerta('❌ As senhas não coincidem!'); return; }
   localStorage.setItem(SENHA_PERIGO_KEY, nova);
-  document.getElementById('senha-atual-input').value='';
-  document.getElementById('senha-nova-input').value='';
-  document.getElementById('senha-confirma-input').value='';
-  mostrarAlerta('✅ Senha alterada com sucesso!');
+  document.getElementById('cfg-senha-atual').value='';
+  document.getElementById('cfg-senha-nova').value='';
+  document.getElementById('cfg-senha-confirma').value='';
+  mostrarAlerta('✅ Senha de acesso alterada com sucesso!');
 }
+
+// ====================================================
+// CONTA MANUAL PELO GARÇOM
+// ====================================================
+function abrirContaManual(){
+  const cfg=getConfig(); const total=parseInt(cfg.totalMesas)||10;
+  const mesa=prompt(`💳 Gerar conta para qual mesa? (1 a ${total})`);
+  if(!mesa||isNaN(parseInt(mesa))) return;
+  const mesaNum=String(parseInt(mesa));
+  const acc=getPedidosMesa(); const pedidosMesa=acc[mesaNum]||[];
+  if(!pedidosMesa.length){
+    // Abre conta mesmo sem pedidos registrados
+    contaMesaAtual={mesa:mesaNum,chamadoId:null};
+    document.getElementById('conta-mesa-num').textContent=mesaNum;
+    const cfgTaxa=getConfig(); document.getElementById('taxa-check').checked=!!(cfgTaxa.taxaPadrao);
+    document.getElementById('conta-sec-garcom').style.display='none';
+    document.getElementById('conta-sec-cozinha').style.display='none';
+    document.getElementById('conta-sem-pedidos').style.display='block';
+    contaSubtotalPuro=0; recalcularConta();
+    document.getElementById('modal-conta').classList.add('show');
+    return;
+  }
+  // Usa a lógica existente de abrirConta mas sem chamadoId
+  contaMesaAtual={mesa:mesaNum,chamadoId:null};
+  const cfgTaxa=getConfig(); document.getElementById('taxa-check').checked=!!(cfgTaxa.taxaPadrao);
+  document.getElementById('conta-mesa-num').textContent=mesaNum;
+  const itensG=[],itensC=[];
+  pedidosMesa.forEach(p=>{ p.itens.forEach(it=>{ const dest=(it.cat==='cozinha')?itensC:itensG; const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
+  let subG=0,subC=0;
+  const renderLinha=(it)=>`<div class="conta-item-linha"><span class="conta-item-nome">${it.cod?'['+it.cod+'] ':''} ${it.desc}</span><span class="conta-item-qty">${it.qty}× ${fmtBrl(it.valor)}</span><span class="conta-item-sub">${fmtBrl(it.sub)}</span></div>`;
+  if(itensG.length){ subG=itensG.reduce((a,i)=>a+i.sub,0); document.getElementById('conta-itens-garcom').innerHTML=itensG.map(renderLinha).join(''); document.getElementById('conta-sub-garcom').textContent=fmtBrl(subG); document.getElementById('conta-sec-garcom').style.display='block'; } else document.getElementById('conta-sec-garcom').style.display='none';
+  if(itensC.length){ subC=itensC.reduce((a,i)=>a+i.sub,0); document.getElementById('conta-itens-cozinha').innerHTML=itensC.map(renderLinha).join(''); document.getElementById('conta-sub-cozinha').textContent=fmtBrl(subC); document.getElementById('conta-sec-cozinha').style.display='block'; } else document.getElementById('conta-sec-cozinha').style.display='none';
+  document.getElementById('conta-sem-pedidos').style.display=(!itensG.length&&!itensC.length)?'block':'none';
+  contaSubtotalPuro=subG+subC; recalcularConta();
+  document.getElementById('modal-conta').classList.add('show');
+}
+
 
 // ====================================================
 // RELATÓRIO DE FATURAMENTO

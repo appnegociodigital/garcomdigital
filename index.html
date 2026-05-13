@@ -1026,15 +1026,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
       <div class="conta-mesa-num" id="conta-mesa-num">—</div>
       <div class="conta-mesa-lbl">Mesa</div>
     </div>
-    <div class="conta-secao" id="conta-sec-garcom" style="display:none">
-      <div class="conta-secao-titulo">🟠 Garçom — Bebidas & Extras</div>
-      <div id="conta-itens-garcom"></div>
-      <div class="conta-subtotal"><span>Subtotal Garçom</span><span id="conta-sub-garcom">R$ 0,00</span></div>
-    </div>
-    <div class="conta-secao" id="conta-sec-cozinha" style="display:none">
-      <div class="conta-secao-titulo">🟢 Cozinha — Pratos & Refeições</div>
-      <div id="conta-itens-cozinha"></div>
-      <div class="conta-subtotal"><span>Subtotal Cozinha</span><span id="conta-sub-cozinha">R$ 0,00</span></div>
+    <div class="conta-secao" id="conta-sec-itens" style="display:none">
+      <div id="conta-itens-todos"></div>
     </div>
     <div id="conta-sem-pedidos" style="text-align:center;padding:20px;color:var(--gray);font-size:13px;font-weight:600;display:none;">ℹ️ Nenhum pedido registrado. Conta zerada.</div>
     <div class="conta-taxa-row">
@@ -1576,14 +1569,14 @@ function abrirConta(mesa,chamadoId){
   const acc=getPedidosMesa(); const pedidosMesa=acc[mesa]||[];
   document.getElementById('conta-mesa-num').textContent=mesa;
   const cfg=getConfig(); document.getElementById('taxa-check').checked=!!(cfg.taxaPadrao);
-  const itensG=[],itensC=[];
-  pedidosMesa.forEach(p=>{ p.itens.forEach(it=>{ const dest=(it.cat==='cozinha')?itensC:itensG; const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
-  let subG=0,subC=0;
+  // Lista unificada na ordem dos pedidos, agrupando itens iguais
+  const todosItens=[];
+  pedidosMesa.forEach(p=>{ p.itens.forEach(it=>{ const ex=todosItens.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else todosItens.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
   const renderLinha=(it)=>`<div class="conta-item-linha"><span class="conta-item-nome">${it.cod?'['+it.cod+'] ':''} ${it.desc}</span><span class="conta-item-qty">${it.qty}× ${fmtBrl(it.valor)}</span><span class="conta-item-sub">${fmtBrl(it.sub)}</span></div>`;
-  if(itensG.length){ subG=itensG.reduce((a,i)=>a+i.sub,0); document.getElementById('conta-itens-garcom').innerHTML=itensG.map(renderLinha).join(''); document.getElementById('conta-sub-garcom').textContent=fmtBrl(subG); document.getElementById('conta-sec-garcom').style.display='block'; } else document.getElementById('conta-sec-garcom').style.display='none';
-  if(itensC.length){ subC=itensC.reduce((a,i)=>a+i.sub,0); document.getElementById('conta-itens-cozinha').innerHTML=itensC.map(renderLinha).join(''); document.getElementById('conta-sub-cozinha').textContent=fmtBrl(subC); document.getElementById('conta-sec-cozinha').style.display='block'; } else document.getElementById('conta-sec-cozinha').style.display='none';
-  document.getElementById('conta-sem-pedidos').style.display=(!itensG.length&&!itensC.length)?'block':'none';
-  contaSubtotalPuro=subG+subC; recalcularConta();
+  const secItens=document.getElementById('conta-sec-itens');
+  if(todosItens.length){ document.getElementById('conta-itens-todos').innerHTML=todosItens.map(renderLinha).join(''); secItens.style.display='block'; } else secItens.style.display='none';
+  document.getElementById('conta-sem-pedidos').style.display=(!todosItens.length)?'block':'none';
+  contaSubtotalPuro=todosItens.reduce((a,i)=>a+i.sub,0); recalcularConta();
   document.getElementById('modal-conta').classList.add('show');
 }
 
@@ -1602,19 +1595,15 @@ function enviarWhatsapp(){
   const cfg = getConfig(); const nomeR = cfg.nome||'Restaurante'; const mesa = contaMesaAtual.mesa;
   const acc = getPedidosMesa(); const peds = acc[mesa]||[];
   const taxa = document.getElementById('taxa-check').checked;
-  const itensG=[], itensC=[];
-  peds.forEach(p=>{ p.itens.forEach(it=>{ const dest=(it.cat==='cozinha')?itensC:itensG; const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
-  const subG=itensG.reduce((a,i)=>a+i.sub,0); const subC=itensC.reduce((a,i)=>a+i.sub,0);
-  const subtotal=subG+subC; const taxaVal=taxa?subtotal*0.1:0; const total=subtotal+taxaVal;
+  const todosItens=[];
+  peds.forEach(p=>{ p.itens.forEach(it=>{ const ex=todosItens.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else todosItens.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
+  const subtotal=todosItens.reduce((a,i)=>a+i.sub,0); const taxaVal=taxa?subtotal*0.1:0; const total=subtotal+taxaVal;
   const agora=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-  let msg = `*${nomeR}*\n`;
-  msg += `===== CONTA =====\n`;
-  msg += `*Mesa ${mesa}* | ${agora}\n\n`;
-  if(itensG.length){ msg+=`🟠 *GARÇOM*\n`; itensG.forEach(i=>{ msg+=`  ${i.qty}x ${i.cod?'['+i.cod+'] ':''} ${i.desc} — ${fmtBrl(i.sub)}\n`; }); msg+=`Subtotal: ${fmtBrl(subG)}\n\n`; }
-  if(itensC.length){ msg+=`🟢 *COZINHA*\n`; itensC.forEach(i=>{ msg+=`  ${i.qty}x ${i.cod?'['+i.cod+'] ':''} ${i.desc} — ${fmtBrl(i.sub)}\n`; }); msg+=`Subtotal: ${fmtBrl(subC)}\n\n`; }
+  let msg = `*${nomeR}*\n===== CONTA =====\n*Mesa ${mesa}* | ${agora}\n\n`;
+  todosItens.forEach(i=>{ msg+=`  ${i.qty}x ${i.cod?'['+i.cod+'] ':''} ${i.desc} — ${fmtBrl(i.valor)} un. = ${fmtBrl(i.sub)}\n`; });
+  msg+=`\nSubtotal: ${fmtBrl(subtotal)}\n`;
   if(taxa) msg+=`Taxa de Serviço (10%): ${fmtBrl(taxaVal)}\n`;
   msg+=`*TOTAL: ${fmtBrl(total)}*\n\nObrigado pela visita! 🙏`;
-  // Pede o telefone do cliente
   const tel = prompt('📲 Digite o número do cliente com DDD (apenas números):\nEx: 85999998888');
   if(!tel || tel.trim()==='') return;
   const telLimpo = tel.replace(/\D/g,'');
@@ -1652,15 +1641,15 @@ function imprimirConta(){
   const cfg=getConfig(); const nomeR=cfg.nome||'Restaurante'; const mesa=contaMesaAtual.mesa;
   const acc=getPedidosMesa(); const peds=acc[mesa]||[]; const taxa=document.getElementById('taxa-check').checked;
   const agora=new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-  const itensG=[],itensC=[];
-  peds.forEach(p=>{ p.itens.forEach(it=>{ const dest=(it.cat==='cozinha')?itensC:itensG; const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
-  const subG=itensG.reduce((a,i)=>a+i.sub,0); const subC=itensC.reduce((a,i)=>a+i.sub,0); const subtotal=subG+subC; const taxaVal=taxa?subtotal*0.1:0; const total=subtotal+taxaVal;
-  const linhaItem=(it)=>`<div class="pt-row"><span>${it.qty}x ${it.cod?'['+it.cod+'] ':''} ${it.desc}</span><span>${fmtBrl(it.sub)}</span></div>`;
+  const todosItens=[];
+  peds.forEach(p=>{ p.itens.forEach(it=>{ const ex=todosItens.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else todosItens.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
+  const subtotal=todosItens.reduce((a,i)=>a+i.sub,0); const taxaVal=taxa?subtotal*0.1:0; const total=subtotal+taxaVal;
+  const linhaItem=(it)=>`<div class="pt-row"><span>${it.qty}x ${it.cod?'['+it.cod+'] ':''} ${it.desc}</span><span>${fmtBrl(it.valor)} un.</span><span>${fmtBrl(it.sub)}</span></div>`;
   let html=`<div class="print-ticket"><div class="pt-center pt-bold" style="font-size:15px;">${nomeR}</div><div class="pt-center">===== CONTA =====</div><div class="pt-center">Mesa ${mesa} | ${agora}</div><div class="pt-line"></div>`;
-  if(itensG.length){ html+=`<div class="pt-bold">🟠 GARÇOM</div>`+itensG.map(linhaItem).join('')+`<div class="pt-row"><b>Subtotal</b><b>${fmtBrl(subG)}</b></div><div class="pt-line"></div>`; }
-  if(itensC.length){ html+=`<div class="pt-bold">🟢 COZINHA</div>`+itensC.map(linhaItem).join('')+`<div class="pt-row"><b>Subtotal</b><b>${fmtBrl(subC)}</b></div><div class="pt-line"></div>`; }
-  if(taxa) html+=`<div class="pt-row"><span>Taxa de Serviço (10%)</span><span>${fmtBrl(taxaVal)}</span></div><div class="pt-line"></div>`;
-  html+=`<div class="pt-row pt-total pt-bold"><span>TOTAL</span><span>${fmtBrl(total)}</span></div><div class="pt-center" style="margin-top:10px;font-size:11px;">Obrigado pela visita! • Garçom Digital</div></div>`;
+  html+=todosItens.map(linhaItem).join('');
+  html+=`<div class="pt-line"></div><div class="pt-row"><span>Subtotal</span><span></span><span>${fmtBrl(subtotal)}</span></div>`;
+  if(taxa) html+=`<div class="pt-row"><span>Taxa de Serviço (10%)</span><span></span><span>${fmtBrl(taxaVal)}</span></div>`;
+  html+=`<div class="pt-line"></div><div class="pt-row pt-total pt-bold"><span>TOTAL</span><span></span><span>${fmtBrl(total)}</span></div><div class="pt-center" style="margin-top:10px;font-size:11px;">Obrigado pela visita! • Garçom Digital</div></div>`;
   document.getElementById('print-area').innerHTML=html; window.print();
 }
 
@@ -2465,30 +2454,24 @@ function abrirContaManual(){
   if(!mesa||isNaN(parseInt(mesa))) return;
   const mesaNum=String(parseInt(mesa));
   const acc=getPedidosMesa(); const pedidosMesa=acc[mesaNum]||[];
+  contaMesaAtual={mesa:mesaNum,chamadoId:null};
+  document.getElementById('conta-mesa-num').textContent=mesaNum;
+  const cfgTaxa=getConfig(); document.getElementById('taxa-check').checked=!!(cfgTaxa.taxaPadrao);
   if(!pedidosMesa.length){
-    // Abre conta mesmo sem pedidos registrados
-    contaMesaAtual={mesa:mesaNum,chamadoId:null};
-    document.getElementById('conta-mesa-num').textContent=mesaNum;
-    const cfgTaxa=getConfig(); document.getElementById('taxa-check').checked=!!(cfgTaxa.taxaPadrao);
-    document.getElementById('conta-sec-garcom').style.display='none';
-    document.getElementById('conta-sec-cozinha').style.display='none';
+    document.getElementById('conta-sec-itens').style.display='none';
     document.getElementById('conta-sem-pedidos').style.display='block';
     contaSubtotalPuro=0; recalcularConta();
     document.getElementById('modal-conta').classList.add('show');
     return;
   }
-  // Usa a lógica existente de abrirConta mas sem chamadoId
-  contaMesaAtual={mesa:mesaNum,chamadoId:null};
-  const cfgTaxa=getConfig(); document.getElementById('taxa-check').checked=!!(cfgTaxa.taxaPadrao);
-  document.getElementById('conta-mesa-num').textContent=mesaNum;
-  const itensG=[],itensC=[];
-  pedidosMesa.forEach(p=>{ p.itens.forEach(it=>{ const dest=(it.cat==='cozinha')?itensC:itensG; const ex=dest.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else dest.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
-  let subG=0,subC=0;
+  const todosItens=[];
+  pedidosMesa.forEach(p=>{ p.itens.forEach(it=>{ const ex=todosItens.find(x=>x.desc===it.desc&&x.cod===it.cod); if(ex){ ex.qty+=it.qty; ex.sub+=it.qty*it.valor; } else todosItens.push({qty:it.qty,cod:it.cod,desc:it.desc,valor:it.valor,sub:it.qty*it.valor}); }); });
   const renderLinha=(it)=>`<div class="conta-item-linha"><span class="conta-item-nome">${it.cod?'['+it.cod+'] ':''} ${it.desc}</span><span class="conta-item-qty">${it.qty}× ${fmtBrl(it.valor)}</span><span class="conta-item-sub">${fmtBrl(it.sub)}</span></div>`;
-  if(itensG.length){ subG=itensG.reduce((a,i)=>a+i.sub,0); document.getElementById('conta-itens-garcom').innerHTML=itensG.map(renderLinha).join(''); document.getElementById('conta-sub-garcom').textContent=fmtBrl(subG); document.getElementById('conta-sec-garcom').style.display='block'; } else document.getElementById('conta-sec-garcom').style.display='none';
-  if(itensC.length){ subC=itensC.reduce((a,i)=>a+i.sub,0); document.getElementById('conta-itens-cozinha').innerHTML=itensC.map(renderLinha).join(''); document.getElementById('conta-sub-cozinha').textContent=fmtBrl(subC); document.getElementById('conta-sec-cozinha').style.display='block'; } else document.getElementById('conta-sec-cozinha').style.display='none';
-  document.getElementById('conta-sem-pedidos').style.display=(!itensG.length&&!itensC.length)?'block':'none';
-  contaSubtotalPuro=subG+subC; recalcularConta();
+  const secItens=document.getElementById('conta-sec-itens');
+  document.getElementById('conta-itens-todos').innerHTML=todosItens.map(renderLinha).join('');
+  secItens.style.display='block';
+  document.getElementById('conta-sem-pedidos').style.display='none';
+  contaSubtotalPuro=todosItens.reduce((a,i)=>a+i.sub,0); recalcularConta();
   document.getElementById('modal-conta').classList.add('show');
 }
 

@@ -480,7 +480,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;color
     </div>
   </div>
   <div class="topbar-right">
-    <button class="status-pill fechado" id="status-pill-btn" onclick="toggleAberturaManual()" title="Clique para abrir/fechar manualmente"><span class="dot"></span>Carregando...</button>
+    <button class="status-pill fechado" id="status-pill-btn" onclick="toggleAberturaManual()" title="Clique para abrir/fechar manualmente" style="background:#DC2626;color:#fff;border:2px solid #EF4444;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;"><span class="dot" style="width:7px;height:7px;background:white;border-radius:50%;display:inline-block;"></span>Carregando...</button>
     <div class="live-dot offline" id="live-dot"><span></span><span id="live-txt">Conectando...</span></div>
     <div class="clock" id="clock">00:00:00</div>
   </div>
@@ -1078,8 +1078,16 @@ function atualizarStatusPill(){
   const pill = document.getElementById('status-pill-btn');
   if(!pill) return;
   const cfg = getConfig(); const aberto = estaAberto();
-  if(aberto){ pill.className='status-pill aberto'; pill.innerHTML='<span class="dot"></span>'+(cfg.manualAberto!==undefined?'🔧 Aberto (manual)':'🟢 Aberto'); }
-  else { pill.className='status-pill fechado'; pill.innerHTML='<span class="dot"></span>'+(cfg.manualAberto===false?'🔧 Fechado (manual)':'🔴 Fechado'); }
+  const dotHtml = '<span style="width:7px;height:7px;background:rgba(255,255,255,0.9);border-radius:50%;display:inline-block;"'+(aberto?' class="dot"':'')+'></span>';
+  if(aberto){
+    pill.className='status-pill aberto';
+    pill.style.cssText='background:#1FA870;color:#fff;border:2px solid #2EC98A;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;';
+    pill.innerHTML=dotHtml+(cfg.manualAberto!==undefined?'🔧 Aberto':'🟢 Aberto');
+  } else {
+    pill.className='status-pill fechado';
+    pill.style.cssText='background:#DC2626;color:#fff;border:2px solid #EF4444;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;';
+    pill.innerHTML=dotHtml+(cfg.manualAberto===false?'🔧 Fechado':'🔴 Fechado');
+  }
 }
 
 function toggleAberturaManual(){
@@ -1388,30 +1396,30 @@ function fecharModalSenha(){ document.getElementById('modal-senha').classList.re
 function confirmarSenha(){ const val=document.getElementById('senha-input').value; if(val!==SENHA_PERIGO){ document.getElementById('senha-error').style.display='block'; document.getElementById('senha-input').value=''; document.getElementById('senha-input').focus(); return; } fecharModalSenha(); if(perigoAcaoPendente==='limparHistoricoLocal') limparHistoricoLocal(); else if(perigoAcaoPendente==='limparCardapio') limparCardapio(); else if(perigoAcaoPendente==='limparTudo') limparTudo(); }
 
 // ====================================================
-// CARDÁPIO — salva local + Supabase para acesso dos clientes
+// CARDÁPIO — salva local + tabela config no Supabase (cross-device)
 // ====================================================
 function getCardapio(){ try{ return JSON.parse(localStorage.getItem(CARDAPIO_KEY)||'[]'); }catch{ return []; } }
 function saveCardapio(arr){
   localStorage.setItem(CARDAPIO_KEY, JSON.stringify(arr));
-  // Sincroniza com Supabase para que clientes (outros dispositivos) possam acessar
+  // Upsert na tabela config (id=1 fixo)
   fetch(SUPABASE_URL+'/rest/v1/config', {
     method:'POST',
-    headers:{...HEADERS,'Prefer':'resolution=merge-duplicates'},
+    headers:{...HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
     body: JSON.stringify({id:1, cardapio_json: JSON.stringify(arr)})
   }).catch(()=>{});
 }
 
-// Lê cardápio do Supabase (usado pelo lado mesa/cliente)
+// Lê cardápio da tabela config no Supabase — funciona em qualquer dispositivo
 async function mesaGetCardapio(){
   try{
     const r = await mesaApiGet('config?id=eq.1&select=cardapio_json');
-    if(r.length && r[0].cardapio_json){
+    if(r && r.length && r[0].cardapio_json){
       const items = JSON.parse(r[0].cardapio_json);
       localStorage.setItem(CARDAPIO_KEY, JSON.stringify(items));
       return items;
     }
-  }catch(e){}
-  return getCardapio(); // fallback local (mesmo dispositivo/testes)
+  }catch(e){ console.warn('mesaGetCardapio erro:', e); }
+  return getCardapio(); // fallback local (mesmo dispositivo)
 }
 
 function renderCardapio(){
@@ -1485,13 +1493,14 @@ function limparCardapio(){ saveCardapio([]); renderCardapio(); mostrarAlerta('Ca
 async function sincronizarCardapio(){
   const items = getCardapio();
   try{
-    await fetch(SUPABASE_URL+'/rest/v1/config', {
+    const r = await fetch(SUPABASE_URL+'/rest/v1/config', {
       method:'POST',
-      headers:{...HEADERS,'Prefer':'resolution=merge-duplicates'},
+      headers:{...HEADERS,'Prefer':'resolution=merge-duplicates,return=minimal'},
       body: JSON.stringify({id:1, cardapio_json: JSON.stringify(items)})
     });
-    mostrarAlerta('☁️ Cardápio sincronizado com sucesso!');
-  }catch(e){ mostrarAlerta('❌ Erro ao sincronizar. Verifique a conexão.'); }
+    if(!r.ok){ const t=await r.text(); throw new Error(t); }
+    mostrarAlerta('☁️ Cardápio sincronizado! '+items.length+' item(ns) enviados para a nuvem.');
+  }catch(e){ mostrarAlerta('❌ Erro ao sincronizar: '+e.message); }
 }
 function limparHistoricoLocal(){ localStorage.removeItem(HISTORY_KEY); renderizar(); mostrarAlerta('Histórico limpo!'); }
 
@@ -1562,12 +1571,13 @@ function imprimirQRCode(){
   const mesaNum=document.getElementById('qr-mesa-num').textContent;
   const msg=document.getElementById('qr-etiqueta-msg').textContent;
   const nomeRest=cfg.nome||'Restaurante';
-  // Captura o QR como imagem canvas→dataURL
+  // Captura o QR como imagem canvas→dataURL (tenta canvas e img)
+  let qrSrc='';
   const qrCanvas=document.querySelector('#qr-container canvas');
   const qrImg=document.querySelector('#qr-container img');
-  let qrSrc='';
-  if(qrCanvas) qrSrc=qrCanvas.toDataURL('image/png');
-  else if(qrImg) qrSrc=qrImg.src;
+  if(qrCanvas){ try{ qrSrc=qrCanvas.toDataURL('image/png'); }catch(e){} }
+  if(!qrSrc && qrImg && qrImg.src && !qrImg.src.startsWith('data:image/gif')){ qrSrc=qrImg.src; }
+  if(!qrSrc){ mostrarAlerta('⚠️ Aguarde o QR Code carregar e tente novamente.'); return; }
 
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
   <style>
